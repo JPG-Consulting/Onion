@@ -5,7 +5,7 @@
 #----------------------------------------------------------#
 #                  Variables&Functions                     #
 #----------------------------------------------------------#
-RAWGITHOST='https://raw.githubusercontent.com/JPG-Consulting/Onion/test'
+
 
 # First of all, we check if the user is root
 if [[ $EUID -ne 0 ]]; then
@@ -56,6 +56,11 @@ echo ") ENGINE=InnoDB COMMENT="ProFTP user table" CHARSET=utf8;" >> /tmp/proftpd
 echo "" >> /tmp/proftpd.create.sql
 echo "INSERT INTO `ftpgroup` (`groupname`, `gid`, `members`) VALUES ('www-data', $proftpd_default_gid, 'www-data');" >> /tmp/proftpd.create.sql
 
+# now execute sql as root in database!
+echo "Please indicate your MySQL root password"
+mysql -u root -p < /tmp/proftpd.create.sql
+rm -f /tmp/proftpd.create.sql
+
 # Creating sql.conf file
 echo "#" > /etc/proftpd/sql.conf
 echo "# Proftpd sample configuration for SQL-based authentication." >> /etc/proftpd/sql.conf
@@ -103,12 +108,7 @@ echo "RootLogin off" >> /etc/proftpd/sql.conf
 echo "RequireValidShell off" >> /etc/proftpd/sql.conf
 echo "</IfModule>" >> /etc/proftpd/sql.conf
 
-# now execute sql as root in database!
-echo "Please indicate your MySQL root password"
-mysql -u root -p < /tmp/proftpd.create.sql
- 
-rm -f /tmp/proftpd.create.sql
-
+# restart proftpd
 service proftpd restart
 
 
