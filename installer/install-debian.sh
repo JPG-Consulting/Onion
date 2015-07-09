@@ -37,7 +37,13 @@ done
 #----------------------------------------------------------#
 #                     Fail2ban Setup                       #
 #----------------------------------------------------------#
-apt-get --yes install fail2ban
+if [ $(dpkg-query -W -f='${Status}' fail2ban 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    apt-get --yes install fail2ban;
+    if [ $? -ne 0 ]; then
+        echo "Error: can't install fail2ban"
+        exit 1
+    fi
+fi
 
 
 #----------------------------------------------------------#
