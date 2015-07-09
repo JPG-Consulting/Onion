@@ -8,6 +8,18 @@
 RGITHOST='https://raw.githubusercontent.com/JPG-Consulting/Onion/'
 GITVERSION='test';
 
+function is_installed()
+{
+    local INSTALLED_STATUS="ii "
+    local DPKGQUERY=$(dpkg-query -W -f='${db:Status-Abbrev}' $1 2>/dev/null)
+    if [[ $DPKGQUERY == $INSTALLED_STATUS ]]
+    then
+        return 1
+    else
+        return 0
+    fi
+}
+
 # First of all, we check if the user is root
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root"
@@ -48,71 +60,36 @@ fi
 #----------------------------------------------------------#
 #                      Apache Setup                        #
 #----------------------------------------------------------#
-if [ $(dpkg-query -W -f='${Status}' apache2 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    apt-get --yes install apache2;
-    if [ $? -ne 0 ]; then
-        echo "Error: can't install apache2"
-        exit 1
-    fi
-fi
+packages=( "apache2" "openssl" "ssl-cert" )
 
-if [ $(dpkg-query -W -f='${Status}' openssl 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    apt-get --yes install openssl;
-    if [ $? -ne 0 ]; then
-        echo "Error: can't install openssl"
-        exit 1
+for i in "${packages[@]}"
+do
+    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
+    then
+        apt-get --yes install $i
+        if [ $? -ne 0 ]; then
+            echo "Error: can't install $i"
+            exit 1
+        fi
     fi
-fi
-
-if [ $(dpkg-query -W -f='${Status}' ssl-cert 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    apt-get --yes install ssl-cert;
-    if [ $? -ne 0 ]; then
-        echo "Error: can't install ssl-cert"
-        exit 1
-    fi
-fi
+done
 
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
 #----------------------------------------------------------#
-$packages='';
+packages=( "libapache2-mod-php5" "php5-cli" "php5-common" "php5-cgi" )
 
-if [ $(dpkg-query -W -f='${Status}' libapache2-mod-php5 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    if [ -z "$packages" ]; then
-        $packages = 'libapache2-mod-php5'
-    else
-        $packages = '$packages libapache2-mod-php5'
+for i in "${packages[@]}"
+do
+    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
+    then
+        apt-get --yes install $i
+        if [ $? -ne 0 ]; then
+            echo "Error: can't install $i"
+            exit 1
+        fi
     fi
-fi
-
-if [ $(dpkg-query -W -f='${Status}' php5-cli 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    if [ -z "$packages" ]; then
-        $packages = 'php5-cli'
-    else
-        $packages = '$packages php5-cli'
-    fi
-fi
-
-if [ $(dpkg-query -W -f='${Status}' php5-common 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    if [ -z "$packages" ]; then
-        $packages = 'php5-common'
-    else
-        $packages = '$packages php5-common'
-    fi
-fi
-
-if [ $(dpkg-query -W -f='${Status}' php5-cgi 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    if [ -z "$packages" ]; then
-        $packages = 'php5-cgi'
-    else
-        $packages = '$packages php5-cgi'
-    fi
-fi
-
-if [ -n "$packages" ]; then
-    apt-get --yes install $packages
-fi
-
+done
 
 #----------------------------------------------------------#
 #                      MySQL Setup                         #
