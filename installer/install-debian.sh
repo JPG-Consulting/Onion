@@ -46,6 +46,12 @@ while true; do
     fi
 done
 
+# Update the server
+read -e -p "Force update the server? [Y/n] : " force_update
+if [[ ("$force_update" == "y" || "$force_update" == "Y" || "$force_update" == "") ]]; then
+    apt-get --yes update && apt-get --yes upgrade && apt-get dist-upgrade
+fi
+
 #----------------------------------------------------------#
 #                     Fail2ban Setup                       #
 #----------------------------------------------------------#
@@ -77,7 +83,7 @@ done
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
 #----------------------------------------------------------#
-packages=( "libapache2-mod-php5" "php5-cli" "php5-common" "php5-cgi" )
+packages=( "php5" "libapache2-mod-php5" "php5-cli" "php5-common" "php5-cgi" )
 
 for i in "${packages[@]}"
 do
@@ -209,7 +215,19 @@ rm -f /tmp/system.create.sql
 #----------------------------------------------------------#
 #                     Postfix Setup                        #
 #----------------------------------------------------------#
-apt-get --yes install postfix postfix-mysql
+packages=( "postfix" "postfix-mysql" )
+
+for i in "${packages[@]}"
+do
+    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
+    then
+        apt-get --yes install $i
+        if [ $? -ne 0 ]; then
+            echo "Error: can't install $i"
+            exit 1
+        fi
+    fi
+done
 
 # Create mails table
 echo "USE DATABASE $system_database;" > /tmp/postfix.create.sql
@@ -248,12 +266,36 @@ rm -f /tmp/postfix.create.sql
 #----------------------------------------------------------#
 #                     Dovecot Setup                        #
 #----------------------------------------------------------#
-apt-get --yes install dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-lmtpd
+packages=( "dovecot-imapd" "dovecot-pop3d" "dovecot-mysql" "dovecot-lmtpd" )
+
+for i in "${packages[@]}"
+do
+    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
+    then
+        apt-get --yes install $i
+        if [ $? -ne 0 ]; then
+            echo "Error: can't install $i"
+            exit 1
+        fi
+    fi
+done
 
 #----------------------------------------------------------#
 #                     ProFTPd Setup                        #
 #----------------------------------------------------------#
-apt-get --yes install proftpd-basic proftpd-mod-sql
+packages=( "proftpd-basic" "proftpd-mod-sql" )
+
+for i in "${packages[@]}"
+do
+    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
+    then
+        apt-get --yes install $i
+        if [ $? -ne 0 ]; then
+            echo "Error: can't install $i"
+            exit 1
+        fi
+    fi
+done
 
 proftpd_default_uid=$(id -u www-data)
 proftpd_default_gid=$(id -g www-data)
