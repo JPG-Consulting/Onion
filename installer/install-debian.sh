@@ -49,6 +49,14 @@ fi
 #----------------------------------------------------------#
 #                      MySQL Setup                         #
 #----------------------------------------------------------#
+if [ $(dpkg-query -W -f='${Status}' mysql-server 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    apt-get --yes install mysql-server;
+    if [ $? -ne 0 ]; then
+        echo "Error: can't install mysql-server"
+        exit 1
+    fi
+fi
+
 while true; do
     read -e -p "MySQL Password for root: " -s mysql_root_passwd
     read -e -p "MySQL Password for root (again): " -s mysql_root_passwd2
