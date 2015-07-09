@@ -126,29 +126,6 @@ if prompt_yn "Do you want to change the root password?" "Y"; then
 fi
 
 #----------------------------------------------------------#
-#                      Shell accounts                      #
-#----------------------------------------------------------#
-create_user=false;
-if prompt_yn "Create a new user?" "Y"; then
-    while true; do
-        read -e -p "New username : " user_name
-        
-        if [ ! -z "$user_name" -a "$user_name" != " " ]; then
-            adduser $user_name
-            if [ $? -eq 0 ]; then
-                if [ -f /etc/sudoers ]; then
-                    if prompt_yn "Add $user_name to sudoers?" "N"; then
-                        echo "$user_name ALL=(ALL:ALL) ALL" >> /etc/sudoers
-                    fi
-                fi
-                create_user=true;
-                break;
-            fi
-        fi
-    done
-fi
-
-#----------------------------------------------------------#
 #                     Fail2ban Setup                       #
 #----------------------------------------------------------#
 if [ $(dpkg-query -W -f='${Status}' fail2ban 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
