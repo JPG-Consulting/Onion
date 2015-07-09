@@ -62,11 +62,83 @@ done
 echo "CREATE DATABASE $system_database;" > /tmp/system.create.sql
 echo "GRANT SELECT, INSERT, UPDATE, DELETE ON $system_database.* TO '$system_user'@'localhost' IDENTIFIED BY '$system_passwd';" >> /tmp/system.create.sql
 echo "FLUSH PRIVILEGES;" >> /tmp/system.create.sql
+# Create the domains table
+echo "  CREATE TABLE `clients` (" >> /tmp/system.create.sql
+echo "  `id` int(10) unsigned NOT NULL auto_increment," >> /tmp/system.create.sql
+echo "  `cr_date` date default NULL," >> /tmp/system.create.sql
+echo "  `cname` varchar(255) character set utf8 default NULL," >> /tmp/system.create.sql
+echo "  `pname` varchar(255) character set utf8 NOT NULL default ''," >> /tmp/system.create.sql
+echo "  `login` varchar(20) character set utf8 NOT NULL default ''," >> /tmp/system.create.sql
+echo "  `account_id` int(10) unsigned NOT NULL default '0'," >> /tmp/system.create.sql
+echo "  `status` bigint(20) unsigned NOT NULL default '0'," >> /tmp/system.create.sql
+echo "  `phone` varchar(255) character set ascii collate ascii_bin default NULL," >> /tmp/system.create.sql
+echo "  `fax` varchar(255) character set ascii collate ascii_bin default NULL," >> /tmp/system.create.sql
+echo "  `email` varchar(255) character set utf8 default NULL," >> /tmp/system.create.sql
+echo "  `address` varchar(255) character set utf8 default NULL," >> /tmp/system.create.sql
+echo "  `city` varchar(255) character set utf8 default NULL," >> /tmp/system.create.sql
+echo "  `state` varchar(255) character set utf8 default NULL," >> /tmp/system.create.sql
+echo "  `pcode` varchar(10) character set ascii collate ascii_bin default NULL," >> /tmp/system.create.sql
+echo "  `country` char(2) character set ascii collate ascii_bin default NULL," >> /tmp/system.create.sql
+echo "  `locale` varchar(17) character set ascii collate ascii_bin NOT NULL default 'en-US'," >> /tmp/system.create.sql
+echo "  `limits_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "  `params_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "  `perm_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "  `pool_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "  `logo_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "  `tmpl_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "  `sapp_pool_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "  `guid` varchar(36) character set ascii collate ascii_bin NOT NULL default '00000000-0000-0000-0000-000000000000'," >> /tmp/system.create.sql
+echo "  PRIMARY KEY  (`id`)," >> /tmp/system.create.sql
+echo "  UNIQUE KEY `login` (`login`)," >> /tmp/system.create.sql
+echo "  KEY `account_id` (`account_id`)," >> /tmp/system.create.sql
+echo "  KEY `limits_id` (`limits_id`)," >> /tmp/system.create.sql
+echo "  KEY `params_id` (`params_id`)," >> /tmp/system.create.sql
+echo "  KEY `perm_id` (`perm_id`)," >> /tmp/system.create.sql
+echo "  KEY `pool_id` (`pool_id`)," >> /tmp/system.create.sql
+echo "  KEY `logo_id` (`logo_id`)," >> /tmp/system.create.sql
+echo "  KEY `tmpl_id` (`tmpl_id`)," >> /tmp/system.create.sql
+echo "  KEY `sapp_pool_id` (`sapp_pool_id`)," >> /tmp/system.create.sql
+echo "  KEY `pname` (`pname`)" >> /tmp/system.create.sql
+echo ") ENGINE=InnoDB CHARSET=utf8;" >> /tmp/system.create.sql
+echo "" >> /tmp/system.create.sql
+echo "CREATE TABLE `domains` (" >> /tmp/system.create.sql
+echo "    `id` int(10) unsigned NOT NULL auto_increment," >> /tmp/system.create.sql
+echo "    `cr_date` date default NULL," >> /tmp/system.create.sql
+echo "    `name` varchar(255) character set ascii NOT NULL default ''," >> /tmp/system.create.sql
+echo "    `displayName` varchar(255) character set utf8 NOT NULL default ''," >> /tmp/system.create.sql
+echo "    `dns_zone_id` int(10) unsigned NOT NULL default '0'," >> /tmp/system.create.sql
+echo "    `status` bigint(20) unsigned NOT NULL default '0'," >> /tmp/system.create.sql
+echo "    `htype` enum('none','vrt_hst','std_fwd','frm_fwd') NOT NULL default 'none'," >> /tmp/system.create.sql
+echo "    `real_size` bigint(20) unsigned default '0'," >> /tmp/system.create.sql
+echo "    `client_id` int(10) unsigned NOT NULL default '0'," >> /tmp/system.create.sql
+echo "    `cert_rep_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "    `limits_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "    `params_id` int(10) unsigned default NULL," >> /tmp/system.create.sql
+echo "    `guid` varchar(36) character set ascii collate ascii_bin NOT NULL default '00000000-0000-0000-0000-000000000000'," >> /tmp/system.create.sql
+echo "    PRIMARY KEY  (`id`)," >> /tmp/system.create.sql
+echo "    UNIQUE KEY `name` (`name`)," >> /tmp/system.create.sql
+echo "    KEY `cl_id` (`cl_id`)," >> /tmp/system.create.sql
+echo "    KEY `cert_rep_id` (`cert_rep_id`)," >> /tmp/system.create.sql
+echo "    KEY `limits_id` (`limits_id`)," >> /tmp/system.create.sql
+echo "    KEY `params_id` (`params_id`)," >> /tmp/system.create.sql
+echo "    KEY `displayName` (`displayName`)" >> /tmp/system.create.sql
+echo ") ENGINE=InnoDB CHARSET=utf8;" >> /tmp/system.create.sql
         
 # now execute sql as root in database!
 echo "Please indicate your MySQL root password"
 mysql -u root -p < /tmp/system.create.sql
 rm -f /tmp/system.create.sql
+
+
+#----------------------------------------------------------#
+#                     Postfix Setup                        #
+#----------------------------------------------------------#
+apt-get --yes install postfix postfix-mysql
+
+#----------------------------------------------------------#
+#                     Dovecot Setup                        #
+#----------------------------------------------------------#
+apt-get --yes install dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-lmtpd
 
 #----------------------------------------------------------#
 #                     ProFTPd Setup                        #
