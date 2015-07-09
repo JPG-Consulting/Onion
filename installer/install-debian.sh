@@ -20,6 +20,42 @@ function is_installed()
     fi
 }
 
+# Function: prompt_yn
+# -------------------
+# Prompts for a y/n input. Returns 0 if the input is y, 1 if n.
+# $1 is prompt
+# $2 is default (Y|N)
+function prompt_yn()
+{
+    local response=''
+    local prompt="$1"
+    local default="$( echo "$2" | tr '[A-Z]' '[a-z]' )"
+    
+    if [ "$default" = 'y' ]; then
+        prompt="$prompt [Y/n] "
+    else
+        prompt="$prompt [y/N] "
+    fi
+    
+    echo -n "$prompt"
+    
+    while true; do
+        read -s -n 1 response
+        if [ -z "$response" ]; then
+            response="$default"
+        fi
+        
+        response="$( echo $response | tr '[A-Z]' '[a-z]' )"
+        if [ "$response" = 'y' ]; then
+            echo "y"
+            return 0
+        elif [ "$response" = 'n' ]; then
+            echo "n"
+            return 1
+        fi
+    done
+}
+
 # First of all, we check if the user is root
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root"
@@ -36,19 +72,12 @@ if [ ! -e '/usr/bin/wget' ]; then
 fi
 
 # Changing the password of the root user
-while true; do
-    read -e -p "Do you want to change the root password? [Y/n] : " change_password
-    if [[ ("$change_password" == "y" || "$change_password" == "Y" || "$change_password" == "") ]]; then
-        passwd
-        break;
-    elif [[ ("$change_password" == "n" || "$change_password" == "N") ]]; then
-        break;
-    fi
-done
+if prompt_yn "Do you want to change the root password?" "Y"; then
+    passwd
+fi
 
 # Update the server
-read -e -p "Force update the server? [Y/n] : " force_update
-if [[ ("$force_update" == "y" || "$force_update" == "Y" || "$force_update" == "") ]]; then
+if prompt_yn "Update the server?" "Y"; then
     apt-get --yes update && apt-get --yes upgrade && apt-get dist-upgrade
 fi
 
