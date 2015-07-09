@@ -45,6 +45,74 @@ if [ $(dpkg-query -W -f='${Status}' fail2ban 2>/dev/null | grep -c "ok installed
     fi
 fi
 
+#----------------------------------------------------------#
+#                      Apache Setup                        #
+#----------------------------------------------------------#
+if [ $(dpkg-query -W -f='${Status}' apache2 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    apt-get --yes install apache2;
+    if [ $? -ne 0 ]; then
+        echo "Error: can't install apache2"
+        exit 1
+    fi
+fi
+
+if [ $(dpkg-query -W -f='${Status}' openssl 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    apt-get --yes install openssl;
+    if [ $? -ne 0 ]; then
+        echo "Error: can't install openssl"
+        exit 1
+    fi
+fi
+
+if [ $(dpkg-query -W -f='${Status}' ssl-cert 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    apt-get --yes install ssl-cert;
+    if [ $? -ne 0 ]; then
+        echo "Error: can't install ssl-cert"
+        exit 1
+    fi
+fi
+
+#----------------------------------------------------------#
+#                       PHP5 Setup                         #
+#----------------------------------------------------------#
+$packages='';
+
+if [ $(dpkg-query -W -f='${Status}' libapache2-mod-php5 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    if [ -z "$packages" ]; then
+        $packages = 'libapache2-mod-php5'
+    else
+        $packages = '$packages libapache2-mod-php5'
+    fi
+fi
+
+if [ $(dpkg-query -W -f='${Status}' php5-cli 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    if [ -z "$packages" ]; then
+        $packages = 'php5-cli'
+    else
+        $packages = '$packages php5-cli'
+    fi
+fi
+
+if [ $(dpkg-query -W -f='${Status}' php5-common 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    if [ -z "$packages" ]; then
+        $packages = 'php5-common'
+    else
+        $packages = '$packages php5-common'
+    fi
+fi
+
+if [ $(dpkg-query -W -f='${Status}' php5-cgi 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    if [ -z "$packages" ]; then
+        $packages = 'php5-cgi'
+    else
+        $packages = '$packages php5-cgi'
+    fi
+fi
+
+if [ -n "$packages" ]; then
+    apt-get --yes install $packages
+fi
+
 
 #----------------------------------------------------------#
 #                      MySQL Setup                         #
