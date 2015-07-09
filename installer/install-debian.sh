@@ -23,14 +23,25 @@ if [ ! -e '/usr/bin/wget' ]; then
     fi
 fi
 
+# Changing the password of the root user
+while true; do
+    read -e -p "Do you want to change the root password? [Y/n] : " change_password
+    if [[ ("$change_password" == "y" || "$change_password" == "Y" || "$change_password" == "") ]]; then
+        passwd
+        break;
+    elif [[ ("$change_password" == "n" || "$change_password" == "N") ]]; then
+        break;
+    fi
+done
+
 #----------------------------------------------------------#
 #                      MySQL Setup                         #
 #----------------------------------------------------------#
 while true; do
-    read -e -p "MySQL password for root ? : " -s mysql_root_passwd
-    if [[ "$mysql_root_passwd" != "" ]]; then
-        break
-    fi
+    read -e -p "MySQL Password for root: " -s mysql_root_passwd
+    read -e -p "MySQL Password for root (again): " -s mysql_root_passwd2
+    [ "$mysql_root_passwd" = "$mysql_root_passwd2" ] && break
+    echo "Passwords do not match. Please try again."
 done
 
 # stop mysql server
