@@ -62,6 +62,7 @@ done
 echo "CREATE DATABASE $system_database;" > /tmp/system.create.sql
 echo "GRANT SELECT, INSERT, UPDATE, DELETE ON $system_database.* TO '$system_user'@'localhost' IDENTIFIED BY '$system_passwd';" >> /tmp/system.create.sql
 echo "FLUSH PRIVILEGES;" >> /tmp/system.create.sql
+echo "USE DATABASE $system_database;" >> /tmp/system.create.sql
 # Create the domains table
 echo "  CREATE TABLE `clients` (" >> /tmp/system.create.sql
 echo "  `id` int(10) unsigned NOT NULL auto_increment," >> /tmp/system.create.sql
@@ -125,8 +126,7 @@ echo "    KEY `displayName` (`displayName`)" >> /tmp/system.create.sql
 echo ") ENGINE=InnoDB CHARSET=utf8;" >> /tmp/system.create.sql
         
 # now execute sql as root in database!
-echo "Please indicate your MySQL root password"
-mysql -u root -p < /tmp/system.create.sql
+mysql -u root -p $mysql_root_passwd < /tmp/system.create.sql
 rm -f /tmp/system.create.sql
 
 
@@ -134,6 +134,40 @@ rm -f /tmp/system.create.sql
 #                     Postfix Setup                        #
 #----------------------------------------------------------#
 apt-get --yes install postfix postfix-mysql
+
+# Create mails table
+echo "USE DATABASE $system_database;" > /tmp/postfix.create.sql
+echo "CREATE TABLE `mail` (" >> /tmp/postfix.create.sql
+echo "    `id` int(10) unsigned NOT NULL auto_increment," >> /tmp/postfix.create.sql
+echo "    `mail_name` varchar(245) character set ascii NOT NULL default ''," >> /tmp/postfix.create.sql
+echo "    `perm_id` int(10) unsigned NOT NULL default '0'," >> /tmp/postfix.create.sql
+echo "    `postbox` enum('false','true') NOT NULL default 'false'," >> /tmp/postfix.create.sql
+echo "    `account_id` int(10) unsigned NOT NULL default '0'," >> /tmp/postfix.create.sql
+echo "    `redirect` enum('false','true') NOT NULL default 'false'," >> /tmp/postfix.create.sql
+echo "    `redir_addr` varchar(255) character set utf8 default NULL," >> /tmp/postfix.create.sql
+echo "    `mail_group` enum('false','true') NOT NULL default 'false'," >> /tmp/postfix.create.sql
+echo "    `autoresponder` enum('false','true') NOT NULL default 'false'," >> /tmp/postfix.create.sql
+echo "    `spamfilter` enum('false','true') NOT NULL default 'false'," >> /tmp/postfix.create.sql
+echo "    `virusfilter` enum('none','incoming','outgoing','any') NOT NULL default 'none'," >> /tmp/postfix.create.sql
+echo "    `mbox_quota` bigint(20) NOT NULL default '-1'," >> /tmp/postfix.create.sql
+echo "    `domain_id` int(10) unsigned NOT NULL default '0'," >> /tmp/postfix.create.sql
+echo "    PRIMARY KEY  (`id`)," >> /tmp/postfix.create.sql
+echo "    UNIQUE KEY `domain_id` (`domain_id`,`mail_name`)," >> /tmp/postfix.create.sql
+echo "    KEY `account_id` (`account_id`)," >> /tmp/postfix.create.sql
+echo "    KEY `perm_id` (`perm_id`)" >> /tmp/postfix.create.sql
+echo ") ENGINE=InnoDB CHARSET=utf8;" >> /tmp/postfix.create.sql
+echo "" >> /tmp/postfix.create.sql
+echo "CREATE TABLE `mail_aliases` (" >> /tmp/postfix.create.sql
+echo "    `id` int(10) unsigned NOT NULL auto_increment," >> /tmp/postfix.create.sql
+echo "    `mail_id` int(10) unsigned NOT NULL default '0'," >> /tmp/postfix.create.sql
+echo "    `alias` varchar(245) character set ascii NOT NULL default ''," >> /tmp/postfix.create.sql
+echo "    PRIMARY KEY  (`id`)," >> /tmp/postfix.create.sql
+echo "    UNIQUE KEY `mail_id` (`mail_id`,`alias`)" >> /tmp/postfix.create.sql
+echo ") ENGINE=InnoDB CHARSET=utf8;" >> /tmp/postfix.create.sql
+
+# now execute sql as root in database!
+mysql -u root -p $mysql_root_passwd < /tmp/postfix.create.sql
+rm -f /tmp/postfix.create.sql
 
 #----------------------------------------------------------#
 #                     Dovecot Setup                        #
@@ -175,8 +209,7 @@ echo "" >> /tmp/proftpd.create.sql
 echo "INSERT INTO `ftpgroup` (`groupname`, `gid`, `members`) VALUES ('www-data', $proftpd_default_gid, 'www-data');" >> /tmp/proftpd.create.sql
 
 # now execute sql as root in database!
-echo "Please indicate your MySQL root password"
-mysql -u root -p < /tmp/proftpd.create.sql
+mysql -u root -p $mysql_root_passwd < /tmp/proftpd.create.sql
 rm -f /tmp/proftpd.create.sql
 
 # Creating sql.conf file
