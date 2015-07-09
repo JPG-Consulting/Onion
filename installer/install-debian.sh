@@ -5,7 +5,8 @@
 #----------------------------------------------------------#
 #                  Variables&Functions                     #
 #----------------------------------------------------------#
-
+RGITHOST='https://raw.githubusercontent.com/JPG-Consulting/Onion/'
+GITVERSION='test';
 
 # First of all, we check if the user is root
 if [[ $EUID -ne 0 ]]; then
@@ -25,6 +26,22 @@ fi
 #----------------------------------------------------------#
 #                      MySQL Setup                         #
 #----------------------------------------------------------#
+while true; do
+    read -e -p "MySQL password for root ? : " -s mysql_root_passwd
+    if [[ "$mysql_root_passwd" != "" ]]; then
+        break
+    fi
+done
+
+# stop mysql server
+service mysql stop
+# Start mysql without grant tables
+mysqld_safe --skip-grant-tables &
+#Update user with new password
+mysql mysql -e "UPDATE user SET Password=PASSWORD('$mysql_root_passwd') WHERE User='root';FLUSH PRIVILEGES;"
+# stop mysqld_safe an start the mysql service
+service mysql restart
+
 read -e -p "System DataBase name? [psa] : " system_database
 if [[ "$system_database" == "" ]]; then
     system_database="psa"
