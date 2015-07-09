@@ -23,6 +23,35 @@ if [ ! -e '/usr/bin/wget' ]; then
 fi
 
 #----------------------------------------------------------#
+#                      MySQL Setup                         #
+#----------------------------------------------------------#
+read -e -p "System DataBase name? [psa] : " system_database
+if [[ "$system_database" == "" ]]; then
+    system_database="psa"
+fi
+
+read -e -p "System Database Username? [psa] : " system_user
+if [[ "$system_user" == "" ]]; then
+    system_user="proftpd"
+fi
+
+while true; do
+    read -e -p "System Database User password for $system_user ? : " -s system_passwd
+    if [[ "$system_passwd" != "" ]]; then
+        break
+    fi
+done
+
+echo "CREATE DATABASE $system_database;" > /tmp/system.create.sql
+echo "GRANT SELECT, INSERT, UPDATE, DELETE ON $system_database.* TO '$system_user'@'localhost' IDENTIFIED BY '$system_passwd';" >> /tmp/system.create.sql
+echo "FLUSH PRIVILEGES;" >> /tmp/system.create.sql
+        
+# now execute sql as root in database!
+echo "Please indicate your MySQL root password"
+mysql -u root -p < /tmp/system.create.sql
+rm -f /tmp/system.create.sql
+
+#----------------------------------------------------------#
 #                     ProFTPd Setup                        #
 #----------------------------------------------------------#
 apt-get --yes install proftpd-basic proftpd-mod-sql
@@ -30,7 +59,7 @@ apt-get --yes install proftpd-basic proftpd-mod-sql
 proftpd_default_uid=$(id -u www-data)
 proftpd_default_gid=$(id -g www-data)
 
-echo "USE psa;" >> /tmp/proftpd.create.sql
+echo "USE $system_database;" >> /tmp/proftpd.create.sql
 echo "" >> /tmp/proftpd.create.sql
 echo "CREATE TABLE ftp_groups (" >> /tmp/proftpd.create.sql
 echo "    groupname varchar(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL default ''," >> /tmp/proftpd.create.sql
