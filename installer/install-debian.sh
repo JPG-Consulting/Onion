@@ -8,6 +8,26 @@
 RGITHOST='https://raw.githubusercontent.com/JPG-Consulting/Onion/'
 GITVERSION='test';
 
+function new_password_prompt()
+{
+    local  __resultvar=$1
+    local passwd=''
+    local passwd2=''
+    
+    while true; do
+        read -e -p "New password: " -s passwd
+        read -e -p "Retype new password: " -s passwd2
+        [ "$passwd" = "$passwd2" ] && break
+        echo "Passwords do not match. Please try again."
+    done
+    
+    if [[ "$__resultvar" ]]; then
+        eval $__resultvar="'$passwd'"
+    else
+        echo "$passwd"
+    fi
+}
+
 function is_installed()
 {
     local INSTALLED_STATUS="ii "
@@ -71,14 +91,41 @@ if [ ! -e '/usr/bin/wget' ]; then
     fi
 fi
 
-# Changing the password of the root user
+#----------------------------------------------------------#
+#                   Update the server                      #
+#----------------------------------------------------------#
+if prompt_yn "Update the server?" "Y"; then
+    apt-get --yes update && apt-get --yes upgrade && apt-get dist-upgrade
+fi
+
+#----------------------------------------------------------#
+#                   Change root password                   #
+#----------------------------------------------------------#
 if prompt_yn "Do you want to change the root password?" "Y"; then
     passwd
 fi
 
-# Update the server
-if prompt_yn "Update the server?" "Y"; then
-    apt-get --yes update && apt-get --yes upgrade && apt-get dist-upgrade
+#----------------------------------------------------------#
+#                      Shell accounts                      #
+#----------------------------------------------------------#
+create_user=false;
+if prompt_yn "Create a new user?" "Y"; then
+    while true; do
+        read -e -p "New username : " user_name
+        
+        if [ ! -z "$user_name" -a "$user_name" != " " ]; then
+            adduser $user_name
+            if [ $? -eq 0 ]; then
+                if [ -f /etc/sudoers ]; then
+                    if prompt_yn "Add $user_name to sudoers?" "N"; then
+                        echo "$user_name ALL=(ALL:ALL) ALL" >> /etc/sudoers
+                    fi
+                fi
+                create_user=true;
+                break;
+            fi
+        fi
+    done
 fi
 
 #----------------------------------------------------------#
