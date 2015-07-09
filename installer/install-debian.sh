@@ -151,14 +151,17 @@ install_missing_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi 
 #----------------------------------------------------------#
 #                      MySQL Setup                         #
 #----------------------------------------------------------#
-install_missing_packages mysql-server
-
 while true; do
     read -e -p "MySQL Password for root: " -s mysql_root_passwd
     read -e -p "MySQL Password for root (again): " -s mysql_root_passwd2
     [ "$mysql_root_passwd" = "$mysql_root_passwd2" ] && break
     echo "Passwords do not match. Please try again."
 done
+
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password $mysql_root_passwd'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password $mysql_root_passwd'
+
+install_missing_packages mysql-server
 
 # stop mysql server
 service mysql stop
@@ -269,11 +272,20 @@ rm -f /tmp/system.create.sql
 #----------------------------------------------------------#
 #                    PHPMyAdmin Setup                      #
 #----------------------------------------------------------#
+debconf-set-selections <<< 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2'
+debconf-set-selections <<< 'phpmyadmin phpmyadmin/dbconfig-install boolean true'
+debconf-set-selections <<< 'phpmyadmin phpmyadmin/app-password-confirm password $mysql_root_passwd'
+debconf-set-selections <<< 'phpmyadmin phpmyadmin/mysql/admin-pass password $mysql_root_passwd'
+debconf-set-selections <<< 'phpmyadmin phpmyadmin/mysql/app-pass password $mysql_root_passwd'
+
 install_missing_packages phpmyadmin
 
 #----------------------------------------------------------#
 #                     Postfix Setup                        #
 #----------------------------------------------------------#
+debconf-set-selections <<< "postfix	postfix/main_mailer_type select Internet Site";
+debconf-set-selections <<< "postfix postfix/mailname string $(hostname)";
+
 install_missing_packages postfix postfix-mysql
 
 # Create mails table
