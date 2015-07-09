@@ -131,11 +131,13 @@ fi
 #----------------------------------------------------------#
 #                     Fail2ban Setup                       #
 #----------------------------------------------------------#
-if [ $(dpkg-query -W -f='${Status}' fail2ban 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    apt-get --yes install fail2ban;
-    if [ $? -ne 0 ]; then
-        echo "Error: can't install fail2ban"
-        exit 1
+if prompt_yn "Install fail2ban?" "Y"; then
+    if [ $(dpkg-query -W -f='${Status}' fail2ban 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+        apt-get --yes install fail2ban;
+        if [ $? -ne 0 ]; then
+            echo "Error: can't install fail2ban"
+            exit 1
+        fi
     fi
 fi
 
@@ -159,7 +161,7 @@ done
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
 #----------------------------------------------------------#
-packages=( "php5" "libapache2-mod-php5" "php5-cli" "php5-common" "php5-cgi" )
+packages=( "php5" "libapache2-mod-php5" "php5-cli" "php5-common" "php5-cgi" "php5-mysql" "php5-curl" )
 
 for i in "${packages[@]}"
 do
@@ -195,8 +197,18 @@ done
 service mysql stop
 # Start mysql without grant tables
 mysqld_safe --skip-grant-tables &
-#Update user with new password
-mysql mysql -e "UPDATE user SET Password=PASSWORD('$mysql_root_passwd') WHERE User='root';FLUSH PRIVILEGES;"
+# Update root with new password
+mysql -e "UPDATE mysql.user SET Password=PASSWORD('$mysql_root_passwd') WHERE User='root'"
+# Kill the anonymous users
+mysql -e "DROP USER ''@'localhost'"
+# Because our hostname varies we'll use some Bash magic here.
+mysql -e "DROP USER ''@'$(hostname)'"
+# Kill off the demo database
+mysql -e "DROP DATABASE test"
+# Make our changes take effect
+mysql -e "FLUSH PRIVILEGES"
+# Any subsequent tries to run queries this way will get access denied because lack of usr/pwd param
+
 # stop mysqld_safe an start the mysql service
 service mysql restart
 
