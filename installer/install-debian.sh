@@ -289,6 +289,10 @@ echo ") ENGINE=InnoDB CHARSET=utf8;" >> /tmp/system.create.sql
 mysql -u root -p $mysql_root_passwd < /tmp/system.create.sql
 rm -f /tmp/system.create.sql
 
+#----------------------------------------------------------#
+#                    PHPMyAdmin Setup                      #
+#----------------------------------------------------------#
+install_missing_packages phpmyadmin
 
 #----------------------------------------------------------#
 #                     Postfix Setup                        #
