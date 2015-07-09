@@ -28,6 +28,26 @@ function new_password_prompt()
     fi
 }
 
+function install_missing_packages()
+{
+        local all_packages=("$@")
+        local packages=""
+
+        for i in "${all_packages[@]}"; do
+                if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0$
+                        packages="$packages $i"
+                fi
+        done
+
+        if [ -n "$packages" ]; then
+            apt-get --yes install $packages
+            if [ $? -ne 0 ]; then
+                echo "Error: can't install $packages"
+                exit 1
+            fi
+        fi
+}
+
 function is_installed()
 {
     local INSTALLED_STATUS="ii "
@@ -144,47 +164,17 @@ fi
 #----------------------------------------------------------#
 #                      Apache Setup                        #
 #----------------------------------------------------------#
-packages=( "apache2" "openssl" "ssl-cert" )
-
-for i in "${packages[@]}"
-do
-    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
-    then
-        apt-get --yes install $i
-        if [ $? -ne 0 ]; then
-            echo "Error: can't install $i"
-            exit 1
-        fi
-    fi
-done
+install_missing_packages apache2 openssl ssl-cert
 
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
 #----------------------------------------------------------#
-packages=( "php5" "libapache2-mod-php5" "php5-cli" "php5-common" "php5-cgi" "php5-mysql" "php5-curl" )
-
-for i in "${packages[@]}"
-do
-    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
-    then
-        apt-get --yes install $i
-        if [ $? -ne 0 ]; then
-            echo "Error: can't install $i"
-            exit 1
-        fi
-    fi
-done
+install_missing_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi php5-mysql php5-curl
 
 #----------------------------------------------------------#
 #                      MySQL Setup                         #
 #----------------------------------------------------------#
-if [ $(dpkg-query -W -f='${Status}' mysql-server 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    apt-get --yes install mysql-server;
-    if [ $? -ne 0 ]; then
-        echo "Error: can't install mysql-server"
-        exit 1
-    fi
-fi
+install_missing_packages mysql-server
 
 while true; do
     read -e -p "MySQL Password for root: " -s mysql_root_passwd
@@ -303,19 +293,7 @@ rm -f /tmp/system.create.sql
 #----------------------------------------------------------#
 #                     Postfix Setup                        #
 #----------------------------------------------------------#
-packages=( "postfix" "postfix-mysql" )
-
-for i in "${packages[@]}"
-do
-    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
-    then
-        apt-get --yes install $i
-        if [ $? -ne 0 ]; then
-            echo "Error: can't install $i"
-            exit 1
-        fi
-    fi
-done
+install_missing_packages postfix postfix-mysql
 
 # Create mails table
 echo "USE DATABASE $system_database;" > /tmp/postfix.create.sql
@@ -354,36 +332,12 @@ rm -f /tmp/postfix.create.sql
 #----------------------------------------------------------#
 #                     Dovecot Setup                        #
 #----------------------------------------------------------#
-packages=( "dovecot-imapd" "dovecot-pop3d" "dovecot-mysql" "dovecot-lmtpd" )
-
-for i in "${packages[@]}"
-do
-    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
-    then
-        apt-get --yes install $i
-        if [ $? -ne 0 ]; then
-            echo "Error: can't install $i"
-            exit 1
-        fi
-    fi
-done
+install_missing_packages dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-lmtpd
 
 #----------------------------------------------------------#
 #                     ProFTPd Setup                        #
 #----------------------------------------------------------#
-packages=( "proftpd-basic" "proftpd-mod-sql" )
-
-for i in "${packages[@]}"
-do
-    if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ];
-    then
-        apt-get --yes install $i
-        if [ $? -ne 0 ]; then
-            echo "Error: can't install $i"
-            exit 1
-        fi
-    fi
-done
+install_missing_packages proftpd-basic proftpd-mod-sql
 
 proftpd_default_uid=$(id -u www-data)
 proftpd_default_gid=$(id -g www-data)
