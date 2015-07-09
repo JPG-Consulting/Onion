@@ -122,7 +122,7 @@ fi
 #                   Change root password                   #
 #----------------------------------------------------------#
 if prompt_yn "Do you want to change the root password?" "Y"; then
-    passwd
+    passwd root
 fi
 
 #----------------------------------------------------------#
