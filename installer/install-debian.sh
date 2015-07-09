@@ -56,6 +56,53 @@ echo ") ENGINE=InnoDB COMMENT="ProFTP user table" CHARSET=utf8;" >> /tmp/proftpd
 echo "" >> /tmp/proftpd.create.sql
 echo "INSERT INTO `ftpgroup` (`groupname`, `gid`, `members`) VALUES ('www-data', $proftpd_default_gid, 'www-data');" >> /tmp/proftpd.create.sql
 
+# Creating sql.conf file
+echo "#" > /etc/proftpd/sql.conf
+echo "# Proftpd sample configuration for SQL-based authentication." >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "# (This is not to be used if you prefer a PAM-based SQL authentication)" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "<IfModule mod_sql.c>" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "# Choose a SQL backend among MySQL or PostgreSQL." >> /etc/proftpd/sql.conf
+echo "# Both modules are loaded in default configuration, so you have to specify the backend" >> /etc/proftpd/sql.conf
+echo "# or comment out the unused module in /etc/proftpd/modules.conf." >> /etc/proftpd/sql.conf
+echo "# Use 'mysql' or 'postgres' as possible values." >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "SQLBackend mysql" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "#SQLEngine on" >> /etc/proftpd/sql.conf
+echo "#SQLAuthenticate on" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "# Use both a crypted or plaintext password" >> /etc/proftpd/sql.conf
+echo "SQLAuthTypes Crypt Plaintext" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "# Use a backend-crypted or a crypted password" >> /etc/proftpd/sql.conf
+echo "#SQLAuthTypes Backend Crypt" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "# Connection" >> /etc/proftpd/sql.conf
+# TODO: Modify this line!!!
+echo "#SQLConnectInfo proftpd@sql.example.com proftpd_user proftpd_password" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "# Describes both users/groups tables" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "SQLUserInfo ftp_users userid passwd uid gid homedir shell" >> /etc/proftpd/sql.conf
+echo "SQLGroupInfo ftp_groups groupname gid members" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "# Update count every time user logs in" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "SQLLog PASS updatecount" >> /etc/proftpd/sql.conf
+echo "SQLNamedQuery updatecount UPDATE \"count=count+1, accessed=now() WHERE userid='%u'\" ftpuser" >> /etc/proftpd/sql.conf
+echo "# Update modified everytime user uploads or deletes a file >> /etc/proftpd/sql.conf
+echo "SQLLog STOR,DELE modified" >> /etc/proftpd/sql.conf
+echo "SQLNamedQuery modified UPDATE \"modified=now() WHERE userid='%u'\" ftpuser" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "# Security" >> /etc/proftpd/sql.conf
+echo "#" >> /etc/proftpd/sql.conf
+echo "RootLogin off" >> /etc/proftpd/sql.conf
+echo "RequireValidShell off" >> /etc/proftpd/sql.conf
+echo "</IfModule>" >> /etc/proftpd/sql.conf
+
 # now execute sql as root in database!
 echo "Please indicate your MySQL root password"
 mysql -u root -p < /tmp/proftpd.create.sql
