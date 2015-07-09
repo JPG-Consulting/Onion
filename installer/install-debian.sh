@@ -117,7 +117,7 @@ fi
 #                   Update the server                      #
 #----------------------------------------------------------#
 if prompt_yn "Update the server?" "Y"; then
-    apt-get --yes update && apt-get --yes upgrade && apt-get dist-upgrade
+    apt-get --yes update && apt-get --yes upgrade && apt-get --yes dist-upgrade
 fi
 
 #----------------------------------------------------------#
