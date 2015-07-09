@@ -102,6 +102,8 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+
 # Check wget
 if [ ! -e '/usr/bin/wget' ]; then
     apt-get -y install wget
