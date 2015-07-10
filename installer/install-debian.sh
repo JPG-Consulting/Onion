@@ -332,6 +332,9 @@ if [ ! -f /etc/postfix/main.cf.orig ]; then
     cp /etc/postfix/main.cf /etc/postfix/main.cf.orig
 fi
 
+wget $RGITHOST/$GITVERSION/installer/system/etc/postfix/main.cf -O /etc/postfix/main.cf
+sed -i "s/#myhostname =/myhostname = $(hostname)" /etc/postfix/main.cf
+
 # Create mysql config files
 if [ ! -d /etc/postfix/mysql ]; then
     mkdir /etc/postfix/mysql
