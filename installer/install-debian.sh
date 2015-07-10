@@ -145,6 +145,29 @@ fi
 #----------------------------------------------------------#
 install_missing_packages apache2 openssl ssl-cert
 
+# Create directory for vhosts
+if [ ! -d /var/www/default/htdocs ]; then
+    mkdir -p /var/www/default/htdocs
+fi
+
+if [ ! -f /var/www/default/htdocs/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/default/htdocs/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/default/htdocs/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/default/htdocs/index.html
+    echo "</body></html>" >> /var/www/default/htdocs/index.html
+fi
+
+if [ ! -d /var/www/default/htsdocs ]; then
+    mkdir -p /var/www/default/htsdocs
+fi
+
+if [ ! -f /var/www/default/htsdocs/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/default/htsdocs/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/default/htsdocs/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/default/htsdocs/index.html
+    echo "</body></html>" >> /var/www/default/htsdocs/index.html
+fi
+
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
 #----------------------------------------------------------#
