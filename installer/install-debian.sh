@@ -141,43 +141,6 @@ if [ $(dpkg-query -W -f='${Status}' fail2ban 2>/dev/null | grep -c "ok installed
 fi
 
 #----------------------------------------------------------#
-#                      Apache Setup                        #
-#----------------------------------------------------------#
-install_missing_packages apache2 openssl ssl-cert
-
-# Create directory for vhosts
-if [ ! -d /var/www/default/htdocs ]; then
-    mkdir -p /var/www/default/htdocs
-fi
-
-if [ ! -f /var/www/default/htdocs/index.html ]; then
-    echo "<html><body><h1>It works!</h1>" > /var/www/default/htdocs/index.html
-    echo "<p>This is the default web page for this server.</p>" >> /var/www/default/htdocs/index.html
-    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/default/htdocs/index.html
-    echo "</body></html>" >> /var/www/default/htdocs/index.html
-fi
-
-if [ ! -d /var/www/default/htsdocs ]; then
-    mkdir -p /var/www/default/htsdocs
-fi
-
-if [ ! -f /var/www/default/htsdocs/index.html ]; then
-    echo "<html><body><h1>It works!</h1>" > /var/www/default/htsdocs/index.html
-    echo "<p>This is the default web page for this server.</p>" >> /var/www/default/htsdocs/index.html
-    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/default/htsdocs/index.html
-    echo "</body></html>" >> /var/www/default/htsdocs/index.html
-fi
-
-wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default -O /etc/apache2/sites-available/default
-wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default-ssl -O /etc/apache2/sites-available/default-ssl
-wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-default -O /etc/apache2/sites-enabled/000-default
-
-#----------------------------------------------------------#
-#                       PHP5 Setup                         #
-#----------------------------------------------------------#
-install_missing_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi php5-mysql php5-curl
-
-#----------------------------------------------------------#
 #                      MySQL Setup                         #
 #----------------------------------------------------------#
 while true; do
@@ -297,6 +260,43 @@ echo ") ENGINE=InnoDB CHARSET=utf8;" >> /tmp/system.create.sql
 # now execute sql as root in database!
 mysql -u root -p $mysql_root_passwd < /tmp/system.create.sql
 rm -f /tmp/system.create.sql
+
+#----------------------------------------------------------#
+#                      Apache Setup                        #
+#----------------------------------------------------------#
+install_missing_packages apache2 openssl ssl-cert
+
+# Create directory for vhosts
+if [ ! -d /var/www/default/htdocs ]; then
+    mkdir -p /var/www/default/htdocs
+fi
+
+if [ ! -f /var/www/default/htdocs/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/default/htdocs/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/default/htdocs/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/default/htdocs/index.html
+    echo "</body></html>" >> /var/www/default/htdocs/index.html
+fi
+
+if [ ! -d /var/www/default/htsdocs ]; then
+    mkdir -p /var/www/default/htsdocs
+fi
+
+if [ ! -f /var/www/default/htsdocs/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/default/htsdocs/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/default/htsdocs/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/default/htsdocs/index.html
+    echo "</body></html>" >> /var/www/default/htsdocs/index.html
+fi
+
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default -O /etc/apache2/sites-available/default
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default-ssl -O /etc/apache2/sites-available/default-ssl
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-default -O /etc/apache2/sites-enabled/000-default
+
+#----------------------------------------------------------#
+#                       PHP5 Setup                         #
+#----------------------------------------------------------#
+install_missing_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi php5-mysql php5-curl
 
 #----------------------------------------------------------#
 #                    PHPMyAdmin Setup                      #
