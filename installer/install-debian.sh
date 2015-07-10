@@ -8,6 +8,14 @@
 RGITHOST='https://raw.githubusercontent.com/JPG-Consulting/Onion/'
 GITVERSION='test';
 
+COMPANY_COUNTRY_CODE='ES'
+COMPANY_STATE_OR_PROVINCE='Vizcaya'
+COMPANY_LOCALITY=''
+COMPANY_NAME='JPG-Consulting'
+COMPANY_CERT_OU_NAME=''
+COMPANY_CERT_COMMON_NAME=$(hostname --fqdn)
+COMPANY_EMAIL=''
+
 function new_password_prompt()
 {
     local  __resultvar=$1
@@ -101,6 +109,48 @@ if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root"
     exit 1
 fi
+
+# Ask for some company information
+while true; do
+    read -e -p "Country Name (2 letter code) [$COMPANY_COUNTRY_CODE]: " input_var
+    if [ -n "$input_var" ]; then
+        COMPANY_COUNTRY_CODE="$input_var"
+    fi
+
+    read -e -p "State or Province Name (full name) [$COMPANY_STATE_OR_PROVINCE]: " input_var
+    if [ -n "$input_var" ]; then
+        COMPANY_STATE_OR_PROVINCE="$input_var"
+    fi
+    
+    read -e -p "Locality Name (eg, city) [$COMPANY_LOCALITY]: " input_var
+    if [ -n "$input_var" ]; then
+        COMPANY_LOCALITY="$input_var"
+    fi
+    
+    read -e -p "Organization Name (eg, company) [$COMPANY_NAME]: " input_var
+    if [ -n "$input_var" ]; then
+        COMPANY_NAME="$input_var"
+    fi
+    
+    read -e -p "Organizational Unit Name (eg, section) [$COMPANY_CERT_OU_NAME]: " input_var
+    if [ -n "$input_var" ]; then
+        COMPANY_CERT_OU_NAME="$input_var"
+    fi
+    
+    read -e -p "Common Name (eg, YOUR name) [$COMPANY_CERT_COMMON_NAME]: " input_var
+    if [ -n "$input_var" ]; then
+        COMPANY_CERT_COMMON_NAME="$input_var"
+    fi
+    
+    read -e -p "Email Address [$COMPANY_EMAIL]: " input_var
+    if [ -n "$input_var" ]; then
+        COMPANY_EMAIL="$input_var"
+    fi
+    
+    if prompt_yn "Is the information correct?" "Y"; then
+        break
+    fi
+done
 
 export DEBIAN_FRONTEND=noninteractive
 
