@@ -235,7 +235,8 @@ wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-defaul
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
 #----------------------------------------------------------#
-install_missing_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi php5-mysql php5-curl
+install_missing_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi php5-mysql php5-curl php5-gd php5-mcrypt php5-memcache php5-memcached php5-intl
+
 
 #----------------------------------------------------------#
 #                    PHPMyAdmin Setup                      #
