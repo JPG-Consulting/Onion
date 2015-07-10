@@ -40,7 +40,7 @@ function install_missing_packages()
         done
 
         if [ -n "$packages" ]; then
-            apt-get --yes install $packages
+            apt-get --yes -qq install $packages
             if [ $? -ne 0 ]; then
                 echo "Error: can't install $packages"
                 exit 1
@@ -106,7 +106,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Check wget
 if [ ! -e '/usr/bin/wget' ]; then
-    apt-get -y install wget
+    apt-get --yes -qq install wget
     if [ $? -ne 0 ]; then
         echo "Error: can't install wget"
         exit 1
@@ -117,7 +117,7 @@ fi
 #                   Update the server                      #
 #----------------------------------------------------------#
 if prompt_yn "Update the server?" "Y"; then
-    apt-get --yes update && apt-get --yes upgrade && apt-get --yes dist-upgrade
+    apt-get --yes -qq update && apt-get --yes -qq upgrade && apt-get --yes -qq dist-upgrade
 fi
 
 #----------------------------------------------------------#
@@ -132,7 +132,7 @@ fi
 #----------------------------------------------------------#
 if [ $(dpkg-query -W -f='${Status}' fail2ban 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     if prompt_yn "Install fail2ban?" "Y"; then
-        apt-get --yes install fail2ban;
+        apt-get --yes -qq install fail2ban;
         if [ $? -ne 0 ]; then
             echo "Error: can't install fail2ban"
             exit 1
