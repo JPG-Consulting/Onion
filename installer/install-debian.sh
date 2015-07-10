@@ -295,7 +295,13 @@ wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default-
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-default -O /etc/apache2/sites-enabled/000-default
 
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/onion-ssl -O /etc/apache2/sites-available/onion-ssl
-wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-onion -O /etc/apache2/sites-enabled/000-onion
+
+a2ensite default-ssl
+a2ensite onion-ssl
+a2enmod ssl
+a2enmod fcgid suexec actions
+
+service apache2 restart
 
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
