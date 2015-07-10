@@ -424,6 +424,15 @@ wget $RGITHOST/$GITVERSION/installer/system/etc/dovecot/conf.d/10-ssl.conf -O /e
 # modify /etc/dovecot/dovecot-sql.conf.ext
 sed -i "s/#connect =/connect = host=127.0.0.1 dbname=$system_database user=$system_user password=$system_passwd/" /etc/dovecot/dovecot-sql.conf.ext
 
+# Certificate (TODO: Auto the fields of the certificate )
+if [ ! -f /etc/ssl/certs/dovecot.pem ]; then
+    openssl req -new -x509 -days 3650 -nodes -out /etc/ssl/certs/dovecot.pem -keyout /etc/ssl/private/dovecot.pem
+    chmod o= /etc/ssl/private/dovecot.pem
+elif [ ! -f /etc/ssl/private/dovecot.pem ]; then
+    openssl req -new -x509 -days 3650 -nodes -out /etc/ssl/certs/dovecot.pem -keyout /etc/ssl/private/dovecot.pem
+    chmod o= /etc/ssl/private/dovecot.pem
+fi
+
 # Set file permissions
 groupadd -g 5000 vmail
 useradd -g vmail -u 5000 vmail -d /var/mail
