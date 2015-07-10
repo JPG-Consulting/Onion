@@ -203,30 +203,42 @@ rm -f /tmp/mysql.create.sql
 #----------------------------------------------------------#
 #                      Apache Setup                        #
 #----------------------------------------------------------#
-install_missing_packages apache2 openssl ssl-cert
+install_missing_packages apache2 apache2-suexec-custom libapache2-mod-fcgid openssl ssl-cert
 
 # Create directory for vhosts
-if [ ! -d /var/www/default/htdocs ]; then
-    mkdir -p /var/www/default/htdocs
+if [ ! -d /var/www/vhosts/default/htdocs ]; then
+    mkdir -p /var/www/vhosts/default/htdocs
 fi
 
-if [ ! -f /var/www/default/htdocs/index.html ]; then
-    echo "<html><body><h1>It works!</h1>" > /var/www/default/htdocs/index.html
-    echo "<p>This is the default web page for this server.</p>" >> /var/www/default/htdocs/index.html
-    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/default/htdocs/index.html
-    echo "</body></html>" >> /var/www/default/htdocs/index.html
+if [ ! -f /var/www/vhosts/default/htdocs/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/vhosts/default/htdocs/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/vhosts/default/htdocs/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/vhosts/default/htdocs/index.html
+    echo "</body></html>" >> /var/www/vhosts/default/htdocs/index.html
 fi
 
-if [ ! -d /var/www/default/htsdocs ]; then
-    mkdir -p /var/www/default/htsdocs
+if [ ! -d /var/www/vhosts/default/htsdocs ]; then
+    mkdir -p /var/www/vhosts/default/htsdocs
 fi
 
-if [ ! -f /var/www/default/htsdocs/index.html ]; then
-    echo "<html><body><h1>It works!</h1>" > /var/www/default/htsdocs/index.html
-    echo "<p>This is the default web page for this server.</p>" >> /var/www/default/htsdocs/index.html
-    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/default/htsdocs/index.html
-    echo "</body></html>" >> /var/www/default/htsdocs/index.html
+if [ ! -f /var/www/vhosts/default/htsdocs/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/vhosts/default/htsdocs/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/vhosts/default/htsdocs/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/vhosts/default/htsdocs/index.html
+    echo "</body></html>" >> /var/www/vhosts/default/htsdocs/index.html
 fi
+
+if [ ! -d /var/www/vhosts/onion/htdocs ]; then
+    mkdir -p /var/www/vhosts/onion/htdocs
+fi
+
+if [ ! -d /var/www/vhosts/onion/htsdocs ]; then
+    mkdir -p /var/www/vhosts/onion/htdocs
+fi
+
+echo "/var/www/vhosts/onion/htsdocs" > /etc/apache2/suexec/www-data
+echo "public_html/cgi-bin" >> /etc/apache2/suexec/www-data
+
 
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default -O /etc/apache2/sites-available/default
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default-ssl -O /etc/apache2/sites-available/default-ssl
