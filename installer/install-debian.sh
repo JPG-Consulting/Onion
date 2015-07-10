@@ -168,38 +168,9 @@ if [ ! -f /var/www/default/htsdocs/index.html ]; then
     echo "</body></html>" >> /var/www/default/htsdocs/index.html
 fi
 
-# Default site
-echo "<VirtualHost *:80>" > /etc/apache2/sites-enabled/000-default
-echo "        ServerAdmin webmaster@localhost" >> /etc/apache2/sites-enabled/000-default
-echo "" >> /etc/apache2/sites-enabled/000-default
-echo "        DocumentRoot /var/www/vhosts/default/htdocs" >> /etc/apache2/sites-enabled/000-default
-echo "        <Directory />" >> /etc/apache2/sites-enabled/000-default
-echo "                Options FollowSymLinks" >> /etc/apache2/sites-enabled/000-default
-echo "                AllowOverride None" >> /etc/apache2/sites-enabled/000-default
-echo "        </Directory>" >> /etc/apache2/sites-enabled/000-default
-echo "        <Directory /var/www/vhosts/default/htdocs>" >> /etc/apache2/sites-enabled/000-default
-echo "                Options Indexes FollowSymLinks MultiViews" >> /etc/apache2/sites-enabled/000-default
-echo "                AllowOverride None" >> /etc/apache2/sites-enabled/000-default
-echo "                Order allow,deny" >> /etc/apache2/sites-enabled/000-default
-echo "                allow from all" >> /etc/apache2/sites-enabled/000-default
-echo "        </Directory>" >> /etc/apache2/sites-enabled/000-default
-echo "" >> /etc/apache2/sites-enabled/000-default
-echo "        ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/" >> /etc/apache2/sites-enabled/000-default
-echo "        <Directory \"/usr/lib/cgi-bin\">" >> /etc/apache2/sites-enabled/000-default
-echo "                AllowOverride None" >> /etc/apache2/sites-enabled/000-default
-echo "                Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch" >> /etc/apache2/sites-enabled/000-default
-echo "                Order allow,deny" >> /etc/apache2/sites-enabled/000-default
-echo "                Allow from all" >> /etc/apache2/sites-enabled/000-default
-echo "        </Directory>" >> /etc/apache2/sites-enabled/000-default
-echo "" >> /etc/apache2/sites-enabled/000-default
-echo "        ErrorLog ${APACHE_LOG_DIR}/error.log" >> /etc/apache2/sites-enabled/000-default
-echo "" >> /etc/apache2/sites-enabled/000-default
-echo "        # Possible values include: debug, info, notice, warn, error, crit," >> /etc/apache2/sites-enabled/000-default
-echo "        # alert, emerg." >> /etc/apache2/sites-enabled/000-default
-echo "        LogLevel warn" >> /etc/apache2/sites-enabled/000-default
-echo "" >> /etc/apache2/sites-enabled/000-default
-echo "        CustomLog ${APACHE_LOG_DIR}/access.log combined" >> /etc/apache2/sites-enabled/000-default
-echo "</VirtualHost>" >> /etc/apache2/sites-enabled/000-default
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default -O /etc/apache2/sites-available/default
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default-ssl -O /etc/apache2/sites-available/default-ssl
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-default -O /etc/apache2/sites-enabled/000-default
 
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
@@ -337,6 +308,16 @@ debconf-set-selections <<< 'phpmyadmin phpmyadmin/mysql/admin-pass password $mys
 debconf-set-selections <<< 'phpmyadmin phpmyadmin/mysql/app-pass password $mysql_root_passwd'
 
 install_missing_packages phpmyadmin
+
+if [ -f /etc/apache2/conf.d/phpmyadmin.conf ]; then
+    rm -f /etc/apache2/conf.d/phpmyadmin.conf ]
+fi 
+
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/phpmyadmin -O /etc/apache2/sites-available/phpmyadmin
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/phpmyadmin -O /etc/apache2/sites-enabled/phpmyadmin
+
+# Restart apache service
+service apache2 restart
 
 #----------------------------------------------------------#
 #                     Postfix Setup                        #
