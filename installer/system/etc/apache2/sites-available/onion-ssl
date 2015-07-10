@@ -1,5 +1,4 @@
 <IfModule mod_ssl.c>
-Listen 8443
 
 <VirtualHost _default_:8443>
         ServerAdmin webmaster@localhost
