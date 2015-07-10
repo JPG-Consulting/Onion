@@ -289,11 +289,10 @@ fi
 echo "/var/www/vhosts/onion/htsdocs" > /etc/apache2/suexec/www-data
 echo "public_html/cgi-bin" >> /etc/apache2/suexec/www-data
 
-
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/ports.conf -O /etc/apache2/ports.conf
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default -O /etc/apache2/sites-available/default
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default-ssl -O /etc/apache2/sites-available/default-ssl
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-default -O /etc/apache2/sites-enabled/000-default
-
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/onion-ssl -O /etc/apache2/sites-available/onion-ssl
 
 # Create the suexe user
