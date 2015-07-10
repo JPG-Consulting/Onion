@@ -244,6 +244,9 @@ wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default 
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/default-ssl -O /etc/apache2/sites-available/default-ssl
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-default -O /etc/apache2/sites-enabled/000-default
 
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/onion-ssl -O /etc/apache2/sites-available/onion-ssl
+wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-onion -O /etc/apache2/sites-enabled/000-onion
+
 #----------------------------------------------------------#
 #                       PHP5 Setup                         #
 #----------------------------------------------------------#
