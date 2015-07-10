@@ -191,7 +191,7 @@ fi
 
 read -e -p "System Database Username? [psa] : " system_user
 if [[ "$system_user" == "" ]]; then
-    system_user="proftpd"
+    system_user="psa"
 fi
 
 while true; do
@@ -290,6 +290,34 @@ debconf-set-selections <<< "postfix postfix/mailname string $(hostname)";
 
 install_missing_packages postfix postfix-mysql
 
+# Backups
+if [ ! -f /etc/postfix/main.cf.orig ]; then
+    cp /etc/postfix/main.cf /etc/postfix/main.cf.orig
+fi
+
+# Create mysql config files
+if [ ! -d /etc/postfix/mysql ]; then
+    mkdir /etc/postfix/mysql
+fi
+
+echo "user = $system_user" > /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "query = SELECT 1 FROM domains WHERE name='%s' AND active=1" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+
+echo "user = $system_user" > /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "query = SELECT 1 FROM mail INNER JOIN domains ON mail.domain_id=domains.id WHERE mail.mail_name='%u' AND domains.name='%d'" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+
+echo "user = $system_user" > /etc/postfix/mysql/virtual-alias-maps.cf
+echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-alias-maps.cf
+echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-alias-maps.cf
+echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-alias-maps.cf
+echo "query = SELECT CONCAT(mail_aliases.alias, '@', domains.name) FROM mail_aliases INNER JOIN mail ON mail_aliases.mail_id = mail.id INNER JOIN domains ON mail.domain_id = domains.id WHERE mail_aliases.alias = '%u' AND domains.name = '%d'" >> /etc/postfix/mysql/virtual-alias-maps.cf
+
 # Create mails table
 echo "USE DATABASE $system_database;" > /tmp/postfix.create.sql
 echo "CREATE TABLE `mail` (" >> /tmp/postfix.create.sql
@@ -328,6 +356,39 @@ rm -f /tmp/postfix.create.sql
 #                     Dovecot Setup                        #
 #----------------------------------------------------------#
 install_missing_packages dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-lmtpd
+
+# Backups
+if [ ! -f /etc/dovecot/dovecot.conf.orig ]; then
+    cp /etc/dovecot/dovecot.conf /etc/dovecot/dovecot.conf.orig
+fi
+if [ ! -f /etc/dovecot/conf.d/10-mail.conf.orig ]; then
+    cp /etc/dovecot/conf.d/10-mail.conf /etc/dovecot/conf.d/10-mail.conf.orig
+fi
+if [ ! -f /etc/dovecot/conf.d/10-auth.conf.orig ]; then
+    cp /etc/dovecot/conf.d/10-auth.conf /etc/dovecot/conf.d/10-auth.conf.orig
+fi
+if [ ! -f /etc/dovecot/dovecot-sql.conf.ext.orig ]; then
+    cp /etc/dovecot/dovecot-sql.conf.ext /etc/dovecot/dovecot-sql.conf.ext.orig
+fi
+if [ ! -f /etc/dovecot/conf.d/10-master.conf.orig ]; then
+    cp /etc/dovecot/conf.d/10-master.conf /etc/dovecot/conf.d/10-master.conf.orig
+fi
+if [ ! -f /etc/dovecot/conf.d/10-ssl.conf.orig ]; then
+    cp /etc/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf.orig
+fi
+
+# Set file permissions
+groupadd -g 5000 vmail
+useradd -g vmail -u 5000 vmail -d /var/mail
+
+mkdir -p /var/mail/vhosts/
+chown -R vmail:vmail /var/mail
+
+chown -R vmail:dovecot /etc/dovecot
+chmod -R o-rwx /etc/dovecot
+
+# Restart dovecot service
+service dovecot restart
 
 #----------------------------------------------------------#
 #                     ProFTPd Setup                        #
