@@ -296,6 +296,9 @@ wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-enabled/000-defaul
 
 wget $RGITHOST/$GITVERSION/installer/system/etc/apache2/sites-available/onion-ssl -O /etc/apache2/sites-available/onion-ssl
 
+# Create the suexe user
+useradd -r -d /nonexistant -s /bin/false suexec
+
 a2ensite default-ssl
 a2ensite onion-ssl
 a2enmod ssl
