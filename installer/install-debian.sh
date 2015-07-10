@@ -414,6 +414,16 @@ if [ ! -f /etc/dovecot/conf.d/10-ssl.conf.orig ]; then
     cp /etc/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf.orig
 fi
 
+wget $RGITHOST/$GITVERSION/installer/system/etc/dovecot/dovecot.conf -O /etc/dovecot/dovecot.conf
+wget $RGITHOST/$GITVERSION/installer/system/etc/dovecot/dovecot-sql.conf.ext -O /etc/dovecot/dovecot-sql.conf.ext
+wget $RGITHOST/$GITVERSION/installer/system/etc/dovecot/conf.d/10-auth.conf -O /etc/dovecot/conf.d/10-auth.conf
+wget $RGITHOST/$GITVERSION/installer/system/etc/dovecot/conf.d/10-mail.conf -O /etc/dovecot/conf.d/10-mail.conf
+wget $RGITHOST/$GITVERSION/installer/system/etc/dovecot/conf.d/10-master.conf -O /etc/dovecot/conf.d/10-master.conf
+wget $RGITHOST/$GITVERSION/installer/system/etc/dovecot/conf.d/10-ssl.conf -O /etc/dovecot/conf.d/10-ssl.conf
+
+# modify /etc/dovecot/dovecot-sql.conf.ext
+sed -i "s/#connect =/connect = host=127.0.0.1 dbname=$system_database user=$system_user password=$system_passwd/" /etc/dovecot/dovecot-sql.conf.ext
+
 # Set file permissions
 groupadd -g 5000 vmail
 useradd -g vmail -u 5000 vmail -d /var/mail
