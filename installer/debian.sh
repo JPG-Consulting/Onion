@@ -124,4 +124,12 @@ fi
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/database/mysql-structure.sql -O /tmp/mysql-structure.sql
 
 mysql -u root -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE < /tmp/mysql-structure.sql
+if [ $? -ne 0 ]; then
+    rm -f /tmp/mysql-structure.sql
+    echo ""
+    echo "Error: Unable to import database structure."
+    echo ""
+    exit 1
+fi
+
 rm -f /tmp/mysql-structure.sql
