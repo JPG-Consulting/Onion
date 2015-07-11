@@ -1,5 +1,9 @@
 #!/bin/bash
 
+GITHUB_RAW_URL="https://raw.githubusercontent.com/JPG-Consulting/"
+GITHUB_REPOSITORY="Onion"
+GITHUB_REPOSITORY_BRANCH="test"
+
 #----------------------------------------------------------#
 #                General purpose functions                 #
 #----------------------------------------------------------#
@@ -111,3 +115,13 @@ sleep 3
 mysql -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
 mysql -u root -e$MYSQL_ROOT_PASSWORD "GRANT ALL ON *.* TO '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_USER_PASSWORD';"
 mysql -u root -e$MYSQL_ROOT_PASSWORD "FLUSH PRIVILEGES;"
+
+# Get the database structure backup
+if [ -f /tmp/mysql-structure.sql ]; then
+    rm -f /tmp/mysql-structure.sql
+fi
+
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/database/mysql-structure.sql -O /tmp/mysql-structure.sql
+
+mysql -u root -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE < /tmp/mysql-structure.sql
+rm -f /tmp/mysql-structure.sql
