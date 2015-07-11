@@ -188,13 +188,13 @@ fi
 
 # Make changes to the default site
 if [ -f /etc/apache2/sites-available/default ]; then
-    sed -i "s/DocumentRoot \/var\/www/DocumentRoot \/var\/www\/vhosts\/default/" /etc/apache2/sites-available/default
-    sed -i "s/<Directory \/var\/www\/>/<Directory \/var\/www\/vhosts\/default\/>/" /etc/apache2/sites-available/default
+    sed -i "s/^\s*DocumentRoot\s+\/var\/www\s*$/DocumentRoot \/var\/www\/vhosts\/default/" /etc/apache2/sites-available/default
+    sed -i "s/^\s*<Directory \/var\/www\/>\s*$/<Directory \/var\/www\/vhosts\/default\/>/" /etc/apache2/sites-available/default
 fi
 
 if [ -f /etc/apache2/sites-enabled/000-default ]; then
-    sed -i "s/DocumentRoot \/var\/www/DocumentRoot \/var\/www\/vhosts\/default/" /etc/apache2/sites-enabled/000-default
-    sed -i "s/<Directory \/var\/www\/>/<Directory \/var\/www\/vhosts\/default\/>/" /etc/apache2/sites-enabled/000-default
+    sed -i "s/^\s*DocumentRoot\s+\/var\/www\s*$/DocumentRoot \/var\/www\/vhosts\/default/" /etc/apache2/sites-enabled/000-default
+    sed -i "s/^\s*<Directory \/var\/www\/>\s*$/<Directory \/var\/www\/vhosts\/default\/>/" /etc/apache2/sites-enabled/000-default
 fi
 
 # restart apache
