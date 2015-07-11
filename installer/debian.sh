@@ -217,11 +217,11 @@ install_required_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi
 #                     PHPMyAdmin Setup                     #
 #----------------------------------------------------------#
 if [ $(dpkg-query -W -f='${Status}' phpmyadmin | grep -c "install ok installed") -eq 0 ]; then
-    debconf-set-selections <<< 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2'
-    debconf-set-selections <<< 'phpmyadmin phpmyadmin/dbconfig-install boolean true'
-    debconf-set-selections <<< 'phpmyadmin phpmyadmin/app-password-confirm password $MYSQL_ROOT_PASSWORD'
-    debconf-set-selections <<< 'phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_ROOT_PASSWORD'
-    debconf-set-selections <<< 'phpmyadmin phpmyadmin/mysql/app-pass password $MYSQL_ROOT_PASSWORD'
+    debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2"
+    debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean true"
+    debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password $MYSQL_ROOT_PASSWORD"
+    debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_ROOT_PASSWORD"
+    debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password $MYSQL_ROOT_PASSWORD"
 
     apt-get --yes -qq install phpmyadmin
 fi
