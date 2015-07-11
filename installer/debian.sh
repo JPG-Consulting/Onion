@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GITHUB_RAW_URL="https://raw.githubusercontent.com/JPG-Consulting/"
+GITHUB_RAW_URL="https://raw.githubusercontent.com/JPG-Consulting"
 GITHUB_REPOSITORY="Onion"
 GITHUB_REPOSITORY_BRANCH="test"
 
