@@ -246,6 +246,15 @@ if [ ! -f /var/www/vhosts/onion/index.html ]; then
     chmod 0644 /var/www/vhosts/onion/index.html
 fi
 
+if [ ! -f /etc/apache2/ports.conf.orig ]; then
+    mv /etc/apache2/ports.conf /etc/apache2/ports.conf.orig
+else
+    rm -f /etc/apache2/ports.conf
+fi
+
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/apache2/ports.conf -O /etc/apache2/ports.conf
+chmod 0644 /etc/apache2/ports.conf
+
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/apache2/sites-available/onion -O /etc/apache2/sites-available/onion
 chmod 0777 /etc/apache2/sites-available/onion
 
