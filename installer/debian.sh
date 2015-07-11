@@ -320,6 +320,32 @@ echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-alias-maps.cf
 echo "query = SELECT CONCAT(mail_aliases.alias, '@', domains.name) FROM mail_aliases INNER JOIN mail ON mail_aliases.mail_id = mail.id INNER JOIN domains ON mail.domain_id = domains.id WHERE mail_aliases.alias = '%u' AND domains.name = '%d'" >> /etc/postfix/mysql/virtual-alias-maps.cf
 
 #----------------------------------------------------------#
-#                      Postfix setup                       #
+#                      Dovecot setup                       #
 #----------------------------------------------------------#
-echo "Setting Postfix..."
+echo "Setting Dovecot..."
+
+install_required_packages dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-lmtpd
+
+# Backups
+if [ ! -f /etc/dovecot/dovecot.conf.orig ]; then
+    cp /etc/dovecot/dovecot.conf /etc/dovecot/dovecot.conf.orig
+fi
+if [ ! -f /etc/dovecot/conf.d/10-mail.conf.orig ]; then
+    cp /etc/dovecot/conf.d/10-mail.conf /etc/dovecot/conf.d/10-mail.conf.orig
+fi
+if [ ! -f /etc/dovecot/conf.d/10-auth.conf.orig ]; then
+    cp /etc/dovecot/conf.d/10-auth.conf /etc/dovecot/conf.d/10-auth.conf.orig
+fi
+if [ ! -f /etc/dovecot/dovecot-sql.conf.ext.orig ]; then
+    cp /etc/dovecot/dovecot-sql.conf.ext /etc/dovecot/dovecot-sql.conf.ext.orig
+fi
+if [ ! -f /etc/dovecot/conf.d/10-master.conf.orig ]; then
+    cp /etc/dovecot/conf.d/10-master.conf /etc/dovecot/conf.d/10-master.conf.orig
+fi
+if [ ! -f /etc/dovecot/conf.d/10-ssl.conf.orig ]; then
+    cp /etc/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf.orig
+fi
+
+# Restart mail
+service postfix restart
+service dovecot restart
