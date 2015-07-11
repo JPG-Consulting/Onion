@@ -438,4 +438,5 @@ wget $RGITHOST/$GITVERSION/installer/system/etc/proftpd/sql.conf -O /etc/proftpd
 # modify /etc/proftpd/sql.conf
 sed -i "s/#SQLConnectInfo proftpd@sql.example.com proftpd_user proftpd_password/SQLConnectInfo $system_database@localhost $system_user $system_passwd/" /etc/proftpd/sql.conf
 
-
+# Restart ProFTPd
+service proftpd restart
