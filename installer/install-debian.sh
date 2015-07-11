@@ -431,3 +431,11 @@ service dovecot restart
 #----------------------------------------------------------#
 #                     ProFTPd Setup                        #
 #----------------------------------------------------------#
+install_missing_packages proftpd-basic proftpd-mod-mysql
+
+wget $RGITHOST/$GITVERSION/installer/system/etc/proftpd/sql.conf -O /etc/proftpd/sql.conf
+
+# modify /etc/proftpd/sql.conf
+sed -i "s/#SQLConnectInfo proftpd@sql.example.com proftpd_user proftpd_password/SQLConnectInfo $system_database@localhost $system_user $system_passwd/" /etc/proftpd/sql.conf
+
+
