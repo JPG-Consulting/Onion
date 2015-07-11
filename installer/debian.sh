@@ -14,7 +14,7 @@ function install_required_packages()
     local packages=""
 
     for i in "${all_packages[@]}"; do
-        if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0$ ]; then
+        if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0 ]; then
             packages="$packages $i"
         fi
     done
