@@ -57,23 +57,57 @@ fi
 #----------------------------------------------------------#
 while true
 do
-    read -e -p "Enter MySQL root password: " -s MYSQL_ROOT_PASSWD
+    read -e -p "Enter MySQL root password: " -s MYSQL_ROOT_PASSWORD
     echo ""
     read -e -p "Retype MySQL root password: " -s password
     echo ""
 
-    [ "$MYSQL_ROOT_PASSWD" = "$password" ] && break;
+    [ "$MYSQL_ROOT_PASSWORD" = "$password" ] && break;
 
     echo ""
     echo "Sorry, passwords do not match. Please try again."
     echo ""
 done
 
+MYSQL_DATABASE="psa"
+MYSQL_USER="$MYSQL_DATABASE"
+MYSQL_USER_PASSWORD="psapassword"
+
 #----------------------------------------------------------#
 #                      System update                       #
 #----------------------------------------------------------#
-echo ""
 echo "Performing server update..."
-echo ""
 
 apt-get --yes -qq update && apt-get --yes -qq upgrade && apt-get --yes -qq dist-upgrade
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "Error: Unable to perform server update."
+    echo ""
+    exit 1
+fi
+
+#----------------------------------------------------------#
+#                       MySQL Setup                        #
+#----------------------------------------------------------#
+echo "Setting MySQL server..."
+
+if [ $(dpkg-query -W -f='${Status}' mysql-server | grep -c "install ok installed") -eq 0 ]; then
+    debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_ROOT_PASSWORD"
+    debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD"
+
+    apt-get --yes -qq install mysql-server
+fi
+
+# Reset the password
+service mysql stop
+mysqld_safe --skip-grant-tables &
+sleep 3
+mysql -u root -e "UPDATE user SET Password=PASSWORD('$MYSQL_ROOT_PASSWORD') WHERE user='root';" mysql
+mysql -u root -e "FLUSH PRIVILEGES;" mysql
+
+service mysql restart
+sleep 3
+
+mysql -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
+mysql -u root -e$MYSQL_ROOT_PASSWORD "GRANT ALL ON *.* TO '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_USER_PASSWORD';"
+mysql -u root -e$MYSQL_ROOT_PASSWORD "FLUSH PRIVILEGES;"
