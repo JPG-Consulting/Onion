@@ -335,8 +335,8 @@ service apache2 restart
 #----------------------------------------------------------#
 #                     Postfix Setup                        #
 #----------------------------------------------------------#
-debconf-set-selections <<< "postfix	postfix/main_mailer_type select Internet Site";
-debconf-set-selections <<< "postfix postfix/mailname string $(hostname)";
+debconf-set-selections <<< "postfix	postfix/main_mailer_type select Internet Site"
+debconf-set-selections <<< "postfix postfix/mailname string $(hostname)"
 
 install_missing_packages postfix postfix-mysql
 
@@ -431,6 +431,8 @@ service dovecot restart
 #----------------------------------------------------------#
 #                     ProFTPd Setup                        #
 #----------------------------------------------------------#
+debconf-set-selections <<< "proftpd-basic   shared/proftpd/inetd_or_standalone      select  standalone"
+
 install_missing_packages proftpd-basic proftpd-mod-mysql
 
 cp /etc/proftpd/modules.conf /etc/proftpd/modules.conf.orig
