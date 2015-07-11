@@ -433,6 +433,7 @@ service dovecot restart
 #----------------------------------------------------------#
 install_missing_packages proftpd-basic proftpd-mod-mysql
 
+cp /etc/proftpd/sql.conf /etc/proftpd/sql.conf.orig
 wget $RGITHOST/$GITVERSION/installer/system/etc/proftpd/sql.conf -O /etc/proftpd/sql.conf
 
 # modify /etc/proftpd/sql.conf
