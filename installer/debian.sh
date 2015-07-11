@@ -8,6 +8,26 @@ GITHUB_REPOSITORY_BRANCH="test"
 #                General purpose functions                 #
 #----------------------------------------------------------#
 
+function install_required_packages()
+{
+    local all_packages=("$@")
+    local packages=""
+
+    for i in "${all_packages[@]}"; do
+        if [ $(dpkg-query -W -f='${Status}' $i | grep -c "install ok installed") -eq 0$ ]; then
+            packages="$packages $i"
+        fi
+    done
+
+    if [ -n "$packages" ]; then
+        apt-get --yes -qq install $packages
+        if [ $? -ne 0 ]; then
+            echo "Error: can't install $packages"
+            exit 1
+        fi
+    fi
+}
+
 function prompt_yesno()
 {
     local prompt=$1
@@ -133,3 +153,49 @@ if [ $? -ne 0 ]; then
 fi
 
 rm -f /tmp/mysql-structure.sql
+
+#----------------------------------------------------------#
+#                      Apache 2 Setup                      #
+#----------------------------------------------------------#
+echo "Setting Apache 2 server..."
+
+install_required_packages apache2 apache2-suexec-custom libapache2-mod-fcgid openssl ssl-cert
+
+# Create directory for vhosts
+if [ ! -d /var/www/vhosts ]; then
+    mkdir -p /var/www/vhosts
+    chmod 0766 /var/www/vhosts
+fi
+
+# Create the default vhost directory and index file
+if [ ! -d /var/www/vhosts/default ]; then
+    mkdir -p /var/www/vhosts/default
+    chmod 0766 /var/www/vhosts/default
+fi
+
+if [ ! -f /var/www/vhosts/default/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/vhosts/default/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/vhosts/default/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/vhosts/default/index.html
+    echo "</body></html>" >> /var/www/vhosts/default/index.html
+    chmod 0644 /var/www/vhosts/default/index.html
+fi
+
+if [ ! -d /var/www/vhosts/default/cgi-bin ]; then
+    mkdir -p /var/www/vhosts/default/cgi-bin
+    chmod 0766 /var/www/vhosts/default/cgi-bin
+fi
+
+# Make changes to the default site
+if [ -f /etc/apache2/sites-available/default ]; then
+    sed -i "s/DocumentRoot \/var\/www/DocumentRoot \/var\/www\/vhosts\/default/" /etc/apache2/sites-available/default
+    sed -i "s/<Directory \/var\/www\/>/<Directory \/var\/www\/vhosts\/default\/>/" /etc/apache2/sites-available/default
+fi
+
+if [ -f /etc/apache2/sites-enabled/000-default ]; then
+    sed -i "s/DocumentRoot \/var\/www/DocumentRoot \/var\/www\/vhosts\/default/" /etc/apache2/sites-enabled/000-default
+    sed -i "s/<Directory \/var\/www\/>/<Directory \/var\/www\/vhosts\/default\/>/" /etc/apache2/sites-enabled/000-default
+fi
+
+# restart apache
+service apache2 restart
