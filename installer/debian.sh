@@ -229,6 +229,11 @@ if [ $(dpkg-query -W -f='${Status}' phpmyadmin | grep -c "install ok installed")
     apt-get --yes -qq install phpmyadmin
 fi
 
+# Remove the default phpmyadmin config
+if [ -f /etc/apache2/conf.d/phpmyadmin.conf ]; then
+    rm -f /etc/apache2/conf.d/phpmyadmin.conf
+fi
+
 #----------------------------------------------------------#
 #                     Onion Vhost Setup                    #
 #----------------------------------------------------------#
