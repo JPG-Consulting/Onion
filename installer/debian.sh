@@ -226,5 +226,12 @@ if [ $(dpkg-query -W -f='${Status}' phpmyadmin | grep -c "install ok installed")
     apt-get --yes -qq install phpmyadmin
 fi
 
+#----------------------------------------------------------#
+#                     Onion Vhost Setup                    #
+#----------------------------------------------------------#
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/apache2/sites-available/onion -O /etc/apache2/sites-available/onion
+chmod 0777 /etc/apache2/sites-available/onion
+
+#----------------------------------------------
 # restart apache
 service apache2 restart
