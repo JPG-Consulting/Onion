@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `domains` (
 -- Estructura de tabla para la tabla `ftp_groups`
 --
 
-CREATE TABLE IF NOT EXISTS `ftp_groups'  (
+CREATE TABLE IF NOT EXISTS `ftp_groups`  (
   `groupname` varchar(16) NOT NULL default '',
   `gid` smallint(6) NOT NULL default '2001',
   `members` varchar(16) NOT NULL default '',
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `ftp_groups'  (
 --
 -- Estructura de tabla para la tabla `ftp_users`
 --
-CREATE TABLE IF NOT EXISTS ftp_users (
+CREATE TABLE IF NOT EXISTS `ftp_users` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `userid` varchar(32) NOT NULL default '',
   `passwd` varchar(32) NOT NULL default '',
