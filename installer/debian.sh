@@ -127,14 +127,20 @@ service mysql stop
 mysqld_safe --skip-grant-tables &
 sleep 3
 mysql -u root -e "UPDATE user SET Password=PASSWORD('$MYSQL_ROOT_PASSWORD') WHERE user='root';" mysql
+# Kill the anonymous users
+mysql -u root -e "DROP USER ''@'localhost';" mysql
+# Because our hostname varies we'll use some Bash magic here.
+mysql -u root -e "DROP USER ''@'$(hostname)';" mysql
+# Kill off the demo database
+mysql -u root -e "DROP DATABASE test;" mysql
 mysql -u root -e "FLUSH PRIVILEGES;" mysql
 
 service mysql restart
 sleep 3
 
 mysql -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
-mysql -u root -e$MYSQL_ROOT_PASSWORD "GRANT ALL ON *.* TO '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_USER_PASSWORD';"
-mysql -u root -e$MYSQL_ROOT_PASSWORD "FLUSH PRIVILEGES;"
+mysql -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON *.* TO '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_USER_PASSWORD';"
+mysql -u root -p$MYSQL_ROOT_PASSWORD -e "FLUSH PRIVILEGES;"
 
 # Get the database structure backup
 if [ -f /tmp/mysql-structure.sql ]; then
