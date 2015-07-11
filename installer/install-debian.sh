@@ -303,6 +303,11 @@ a2ensite onion-ssl
 a2enmod ssl
 a2enmod fcgid suexec actions
 
+# Adjust ServerTokens and ServerSignature lines to not give away OS and Apache version.
+sed -i "s/ServerTokens OS/ServerTokens Prod/" /etc/apache2/conf.d/security
+sed -i "s/ServerSignature On/ServerSignature Off/" /etc/apache2/conf.d/security
+
+# Restart Apache server
 service apache2 restart
 
 #----------------------------------------------------------#
@@ -346,7 +351,7 @@ if [ ! -f /etc/postfix/main.cf.orig ]; then
 fi
 
 wget $RGITHOST/$GITVERSION/installer/system/etc/postfix/main.cf -O /etc/postfix/main.cf
-sed -i "s/#myhostname =/myhostname = $(hostname)" /etc/postfix/main.cf
+sed -i "s/#myhostname =/myhostname = $(hostname)/" /etc/postfix/main.cf
 
 # Create mysql config files
 if [ ! -d /etc/postfix/mysql ]; then
