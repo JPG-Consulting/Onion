@@ -203,6 +203,9 @@ if [ -f /etc/apache2/sites-enabled/000-default ]; then
     sed -i -e "s/^\s*<Directory \/var\/www\/>\s*$/<Directory \/var\/www\/vhosts\/default\/>/" /etc/apache2/sites-enabled/000-default
 fi
 
+# Enable SSL
+a2enmod ssl
+
 # NOTE: Do not restart apache2 yet!
 #       We should install PHP and PHPAdmin before that.
 
@@ -229,8 +232,24 @@ fi
 #----------------------------------------------------------#
 #                     Onion Vhost Setup                    #
 #----------------------------------------------------------#
+# Create the default vhost directory and index file
+if [ ! -d /var/www/vhosts/onion ]; then
+    mkdir -p /var/www/vhosts/onion
+    chmod 0755 /var/www/vhosts/onion
+fi
+
+if [ ! -f /var/www/vhosts/onion/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/vhosts/onion/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/vhosts/onion/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/vhosts/onion/index.html
+    echo "</body></html>" >> /var/www/vhosts/onion/index.html
+    chmod 0644 /var/www/vhosts/onion/index.html
+fi
+
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/apache2/sites-available/onion -O /etc/apache2/sites-available/onion
 chmod 0777 /etc/apache2/sites-available/onion
+
+a2ensite onion
 
 #----------------------------------------------
 # restart apache
