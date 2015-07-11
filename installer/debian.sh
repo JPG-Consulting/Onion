@@ -197,5 +197,28 @@ if [ -f /etc/apache2/sites-enabled/000-default ]; then
     sed -i -e "s/^\s*<Directory \/var\/www\/>\s*$/<Directory \/var\/www\/vhosts\/default\/>/" /etc/apache2/sites-enabled/000-default
 fi
 
+# NOTE: Do not restart apache2 yet!
+#       We should install PHP and PHPAdmin before that.
+
+#----------------------------------------------------------#
+#                        PHP Setup                         #
+#----------------------------------------------------------#
+echo "Setting PHP5..."
+
+install_required_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi php5-mysql php5-curl php5-gd php5-mcrypt php5-memcache php5-memcached php5-intl
+
+#----------------------------------------------------------#
+#                     PHPMyAdmin Setup                     #
+#----------------------------------------------------------#
+if [ $(dpkg-query -W -f='${Status}' phpmyadmin | grep -c "install ok installed") -eq 0 ]; then
+    debconf-set-selections <<< 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2'
+    debconf-set-selections <<< 'phpmyadmin phpmyadmin/dbconfig-install boolean true'
+    debconf-set-selections <<< 'phpmyadmin phpmyadmin/app-password-confirm password $mysql_root_passwd'
+    debconf-set-selections <<< 'phpmyadmin phpmyadmin/mysql/admin-pass password $mysql_root_passwd'
+    debconf-set-selections <<< 'phpmyadmin phpmyadmin/mysql/app-pass password $mysql_root_passwd'
+
+    apt-get --yes -qq install phpmyadmin
+fi
+
 # restart apache
 service apache2 restart
