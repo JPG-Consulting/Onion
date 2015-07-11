@@ -164,13 +164,13 @@ install_required_packages apache2 apache2-suexec-custom libapache2-mod-fcgid ope
 # Create directory for vhosts
 if [ ! -d /var/www/vhosts ]; then
     mkdir -p /var/www/vhosts
-    chmod 0766 /var/www/vhosts
+    chmod 0755 /var/www/vhosts
 fi
 
 # Create the default vhost directory and index file
 if [ ! -d /var/www/vhosts/default ]; then
     mkdir -p /var/www/vhosts/default
-    chmod 0766 /var/www/vhosts/default
+    chmod 0755 /var/www/vhosts/default
 fi
 
 if [ ! -f /var/www/vhosts/default/index.html ]; then
@@ -183,7 +183,7 @@ fi
 
 if [ ! -d /var/www/vhosts/default/cgi-bin ]; then
     mkdir -p /var/www/vhosts/default/cgi-bin
-    chmod 0766 /var/www/vhosts/default/cgi-bin
+    chmod 0755 /var/www/vhosts/default/cgi-bin
 fi
 
 # Make changes to the default site
