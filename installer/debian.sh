@@ -268,3 +268,58 @@ a2ensite onion
 #----------------------------------------------
 # restart apache
 service apache2 restart
+
+#----------------------------------------------------------#
+#                      Postfix setup                       #
+#----------------------------------------------------------#
+echo "Setting Postfix..."
+
+if [ $(dpkg-query -W -f='${Status}' postfix | grep -c "install ok installed") -eq 0 ]; then
+    debconf-set-selections <<< "postfix	postfix/main_mailer_type select Internet Site"
+    debconf-set-selections <<< "postfix postfix/mailname string $(hostname)"
+
+    apt-get --yes -qq install postfix
+fi
+
+if [ $(dpkg-query -W -f='${Status}' postfix-mysql | grep -c "install ok installed") -eq 0 ]; then
+    apt-get --yes -qq install postfix-mysql
+fi
+
+# Backups
+if [ ! -f /etc/postfix/main.cf.orig ]; then
+    cp /etc/postfix/main.cf /etc/postfix/main.cf.orig
+fi
+
+postconf -e "myhostname = $(hostname)"
+postconf -e "virtual_transport = lmtp:unix:private/dovecot-lmtp"
+postconf -e "virtual_mailbox_domains = mysql:/etc/postfix/mysql/virtual-mailbox-domains.cf"
+postconf -e "virtual_mailbox_maps = mysql:/etc/postfix/mysql/virtual-mailbox-maps.cf"
+postconf -e "virtual_alias_maps = mysql:/etc/postfix/mysql/virtual-alias-maps.cf"
+
+# Create mysql config files
+if [ ! -d /etc/postfix/mysql ]; then
+    mkdir /etc/postfix/mysql
+fi
+
+echo "user = $system_user" > /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "query = SELECT 1 FROM domains WHERE name='%s' AND active=1" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+
+echo "user = $system_user" > /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "query = SELECT 1 FROM mail INNER JOIN domains ON mail.domain_id=domains.id WHERE mail.mail_name='%u' AND domains.name='%d'" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+
+echo "user = $system_user" > /etc/postfix/mysql/virtual-alias-maps.cf
+echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-alias-maps.cf
+echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-alias-maps.cf
+echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-alias-maps.cf
+echo "query = SELECT CONCAT(mail_aliases.alias, '@', domains.name) FROM mail_aliases INNER JOIN mail ON mail_aliases.mail_id = mail.id INNER JOIN domains ON mail.domain_id = domains.id WHERE mail_aliases.alias = '%u' AND domains.name = '%d'" >> /etc/postfix/mysql/virtual-alias-maps.cf
+
+#----------------------------------------------------------#
+#                      Postfix setup                       #
+#----------------------------------------------------------#
+echo "Setting Postfix..."
