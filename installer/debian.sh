@@ -237,17 +237,18 @@ fi
 #                     Onion Vhost Setup                    #
 #----------------------------------------------------------#
 # Create the default vhost directory and index file
-if [ ! -d /var/www/vhosts/onion ]; then
-    mkdir -p /var/www/vhosts/onion
+if [ ! -d /var/www/vhosts/onion/public_html ]; then
+    mkdir -p /var/www/vhosts/onion/public_html
     chmod 0755 /var/www/vhosts/onion
+    chmod 0755 /var/www/vhosts/onion/public_html
 fi
 
-if [ ! -f /var/www/vhosts/onion/index.html ]; then
-    echo "<html><body><h1>It works!</h1>" > /var/www/vhosts/onion/index.html
-    echo "<p>This is the default web page for this server.</p>" >> /var/www/vhosts/onion/index.html
-    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/vhosts/onion/index.html
-    echo "</body></html>" >> /var/www/vhosts/onion/index.html
-    chmod 0644 /var/www/vhosts/onion/index.html
+if [ ! -f /var/www/vhosts/onion/public_html/index.html ]; then
+    echo "<html><body><h1>It works!</h1>" > /var/www/vhosts/onion/public_html/index.html
+    echo "<p>This is the default web page for this server.</p>" >> /var/www/vhosts/onion/public_html/index.html
+    echo "<p>The web server software is running but no content has been added, yet.</p>" >> /var/www/vhosts/onion/public_html/index.html
+    echo "</body></html>" >> /var/www/vhosts/onion/public_html/index.html
+    chmod 0644 /var/www/vhosts/onion/public_html/index.html
 fi
 
 if [ ! -f /etc/apache2/ports.conf.orig ]; then
