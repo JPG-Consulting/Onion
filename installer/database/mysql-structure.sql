@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `domains` (
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
   `domain_id` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain_id` (`domain_id`,`mail_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 -- --------------------------------------------------------
 --
 -- Estructura de tabla para la tabla `mail_aliases`
@@ -63,7 +63,17 @@ CREATE TABLE IF NOT EXISTS `mail_aliases` (
   `alias` varchar(245) CHARACTER SET ascii NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `mn_id` (`mail_id`,`alias`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+-- --------------------------------------------------------
+--
+-- Estructura de tabla para la tabla `mail_redirects`
+--
+CREATE TABLE IF NOT EXISTS `mail_redirects` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `mail_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `address` varchar(245) CHARACTER SET ascii NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 -- --------------------------------------------------------
 --
 -- Estructura de tabla para la tabla `sys_users`
@@ -79,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `sys_users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `login` (`login`),
   KEY `account_id` (`account_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 --
 -- Restricciones para tablas volcadas
 --
@@ -93,3 +103,8 @@ ALTER TABLE `mail`
 --
 ALTER TABLE `mail_aliases`
   ADD CONSTRAINT `mail_aliases_ibfk_1` FOREIGN KEY (`mail_id`) REFERENCES `mail` (`id`) ON DELETE CASCADE;
+--
+-- Filtros para la tabla `mail_redirects`
+--
+ALTER TABLE `mail_redirects`
+  ADD CONSTRAINT `mail_redirects_ibfk_1` FOREIGN KEY (`mail_id`) REFERENCES `mail` (`id`) ON DELETE CASCADE;
