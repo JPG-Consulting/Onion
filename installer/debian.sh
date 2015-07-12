@@ -213,6 +213,15 @@ a2enmod ssl
 #----------------------------------------------------------#
 echo "Setting PHP5..."
 
+# PHP 5.5
+grep_output="$(grep '# PHP 5.5' /etc/apt/sources.list)"
+if [ -z "$grep_output" ]; then
+    echo "" >> /etc/apt/sources.list
+    echo "# PHP 5.5 " >> /etc/apt/sources.list
+    echo "deb http://packages.dotdeb.org wheezy-php55 all" >> /etc/apt/sources.list
+    echo "deb-src http://packages.dotdeb.org wheezy-php55 all" >> /etc/apt/sources.list
+fi
+
 install_required_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi php5-mysql php5-curl php5-gd php5-mcrypt php5-memcache php5-memcached php5-intl
 
 #----------------------------------------------------------#
@@ -232,15 +241,6 @@ fi
 if [ -f /etc/apache2/conf.d/phpmyadmin.conf ]; then
     rm -f /etc/apache2/conf.d/phpmyadmin.conf
 fi
-
-#----------------------------------------------------------#
-#                       Composer                           #
-#----------------------------------------------------------#
-if [ $(dpkg-query -W -f='${Status}' curl | grep -c "install ok installed") -eq 0 ]; then
-    apt-get --yes -qq install curl
-fi
-
-curl -sS https://getcomposer.org/installer | php
 
 #----------------------------------------------------------#
 #                     Onion Vhost Setup                    #
