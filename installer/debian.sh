@@ -279,6 +279,9 @@ install_required_packages dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-lmtp
 if [ ! -f /etc/dovecot/dovecot.conf.orig ]; then
     cp /etc/dovecot/dovecot.conf /etc/dovecot/dovecot.conf.orig
 fi
+if [ ! -f /etc/dovecot/conf.d/auth-sql.conf.ext.orig ]; then
+    cp /etc/dovecot/conf.d/auth-sql.conf.ext /etc/dovecot/conf.d/auth-sql.conf.ext.orig
+fi
 if [ ! -f /etc/dovecot/conf.d/10-mail.conf.orig ]; then
     cp /etc/dovecot/conf.d/10-mail.conf /etc/dovecot/conf.d/10-mail.conf.orig
 fi
@@ -302,6 +305,7 @@ fi
 
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/dovecot.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/dovecot.conf
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/dovecot-sql.conf.ext -O $INSTALLER_TEMP_PATH/etc/dovecot/dovecot-sql.conf.ext
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/auth-sql.conf.ext -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/auth-sql.conf.ext
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/10-auth.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-auth.conf
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/10-mail.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-mail.conf
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/10-master.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-master.conf
@@ -315,6 +319,8 @@ rm -f /etc/dovecot/dovecot.conf
 mv $INSTALLER_TEMP_PATH/etc/dovecot/dovecot.conf /etc/dovecot/dovecot.conf
 rm -f /etc/dovecot/dovecot-sql.conf.ext
 mv $INSTALLER_TEMP_PATH/etc/dovecot/dovecot-sql.conf.ext /etc/dovecot/dovecot-sql.conf.ext
+rm -f /etc/dovecot/conf.d/auth-sql.conf.ext
+mv $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/auth-sql.conf.ext /etc/dovecot/conf.d/auth-sql.conf.ext
 rm -f /etc/dovecot/conf.d/10-auth.conf
 mv $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-auth.conf /etc/dovecot/conf.d/10-auth.conf
 rm -f /etc/dovecot/conf.d/10-mail.conf
