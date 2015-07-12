@@ -234,6 +234,15 @@ if [ -f /etc/apache2/conf.d/phpmyadmin.conf ]; then
 fi
 
 #----------------------------------------------------------#
+#                       Composer                           #
+#----------------------------------------------------------#
+if [ $(dpkg-query -W -f='${Status}' curl | grep -c "install ok installed") -eq 0 ]; then
+    apt-get --yes -qq install curl
+fi
+
+curl -sS https://getcomposer.org/installer | php
+
+#----------------------------------------------------------#
 #                     Onion Vhost Setup                    #
 #----------------------------------------------------------#
 # Create the default vhost directory and index file
