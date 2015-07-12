@@ -4,6 +4,8 @@ GITHUB_RAW_URL="https://raw.githubusercontent.com/JPG-Consulting"
 GITHUB_REPOSITORY="Onion"
 GITHUB_REPOSITORY_BRANCH="test"
 
+INSTALLER_TEMP_PATH='/tmp/onion-installer'
+
 #----------------------------------------------------------#
 #                General purpose functions                 #
 #----------------------------------------------------------#
@@ -76,6 +78,11 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+if [ ! -d "$INSTALLER_TEMP_PATH" ]; then
+    rm -rf $INSTALLER_PATH
+fi
+mkdir -p $INSTALLER_TEMP_PATH
+
 #----------------------------------------------------------#
 #                     Global Variables                     #
 #----------------------------------------------------------#
@@ -142,23 +149,15 @@ mysql -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DA
 mysql -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON *.* TO '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_USER_PASSWORD';"
 mysql -u root -p$MYSQL_ROOT_PASSWORD -e "FLUSH PRIVILEGES;"
 
-# Get the database structure backup
-if [ -f /tmp/mysql-structure.sql ]; then
-    rm -f /tmp/mysql-structure.sql
-fi
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/database/mysql-structure.sql -O $INSTALLER_TEMP_PATH/mysql-structure.sql
 
-wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/database/mysql-structure.sql -O /tmp/mysql-structure.sql
-
-mysql -u root -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE < /tmp/mysql-structure.sql
+mysql -u root -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE < $INSTALLER_TEMP_PATH/mysql-structure.sql
 if [ $? -ne 0 ]; then
-    rm -f /tmp/mysql-structure.sql
     echo ""
     echo "Error: Unable to import database structure."
     echo ""
     exit 1
 fi
-
-rm -f /tmp/mysql-structure.sql
 
 #----------------------------------------------------------#
 #                      Apache 2 Setup                      #
@@ -295,6 +294,45 @@ fi
 if [ ! -f /etc/dovecot/conf.d/10-ssl.conf.orig ]; then
     cp /etc/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf.orig
 fi
+
+# Download replacement configuration files
+if [ ! -d "$INSTALLER_TEMP_PATH/etc/dovecot/conf.d" ]; then
+    mkdir -p $INSTALLER_TEMP_PATH/etc/dovecot/conf.d
+fi
+
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/dovecot.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/dovecot.conf
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/dovecot-sql.conf.ext -O $INSTALLER_TEMP_PATH/etc/dovecot/dovecot-sql.conf.ext
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/10-auth.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-auth.conf
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/10-mail.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-mail.conf
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/10-master.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-master.conf
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/10-ssl.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-ssl.conf
+
+# modify /etc/dovecot/dovecot-sql.conf.ext
+sed -i "s/#connect =/connect = host=127.0.0.1 dbname=$system_database user=$system_user password=$system_passwd/" $INSTALLER_TEMP_PATH/etc/dovecot/dovecot-sql.conf.ext
+
+# Replace the files
+rm -f /etc/dovecot/dovecot.conf
+mv $INSTALLER_TEMP_PATH/etc/dovecot/dovecot.conf /etc/dovecot/dovecot.conf
+rm -f /etc/dovecot/dovecot-sql.conf.ext
+mv $INSTALLER_TEMP_PATH/etc/dovecot/dovecot-sql.conf.ext /etc/dovecot/dovecot-sql.conf.ext
+rm -f /etc/dovecot/conf.d/10-auth.conf
+mv $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-auth.conf /etc/dovecot/conf.d/10-auth.conf
+rm -f /etc/dovecot/conf.d/10-mail.conf
+mv $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-mail.conf /etc/dovecot/conf.d/10-mail.conf
+rm -f /etc/dovecot/conf.d/10-master.conf
+mv $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-master.conf /etc/dovecot/conf.d/10-master.conf
+rm -f /etc/dovecot/conf.d/10-ssl.conf
+mv $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf
+
+# Set file permissions
+groupadd -g 5000 vmail
+useradd -g vmail -u 5000 vmail -d /var/mail
+
+mkdir -p /var/mail/vhosts/
+chown -R vmail:vmail /var/mail
+
+chown -R vmail:dovecot /etc/dovecot
+chmod -R o-rwx /etc/dovecot
 
 # Restart Dovecot
 service dovecot restart
