@@ -1,17 +1,4 @@
 --
--- Estructura de tabla para la tabla `accounts`
---
-
-CREATE TABLE IF NOT EXISTS `accounts` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT 'plain',
-  `password` text CHARACTER SET ascii COLLATE ascii_bin,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `domains`
 --
 
@@ -61,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `ftp_users` (
 CREATE TABLE IF NOT EXISTS `mail` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mail_name` varchar(245) CHARACTER SET ascii NOT NULL DEFAULT '',
-  `account_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `passwd` text CHARACTER SET ascii COLLATE ascii_bin,
   `domain_id` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain_id` (`domain_id`,`mail_name`),
