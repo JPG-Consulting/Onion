@@ -432,12 +432,26 @@ if [ ! -f /etc/proftpd/sql.conf.orig ]; then
     cp /etc/proftpd/sql.conf /etc/proftpd/sql.conf.orig
 fi
 
+# Download replacement configuration files
+if [ ! -d "$INSTALLER_TEMP_PATH/etc/proftpd" ]; then
+    mkdir -p $INSTALLER_TEMP_PATH/etc/proftpd
+fi
+
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/proftpd/proftpd.conf -O $INSTALLER_TEMP_PATH/etc/proftpd/proftpd.conf
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/proftpd/modules.conf -O $INSTALLER_TEMP_PATH/etc/proftpd/modules.conf
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/proftpd/sql.conf -O $INSTALLER_TEMP_PATH/etc/proftpd/sql.conf
 
 # modify /etc/proftpd/sql.conf
 sed -i "s/#SQLConnectInfo proftpd@sql.example.com proftpd_user proftpd_password/SQLConnectInfo $MYSQL_DATABASE@localhost $MYSQL_USER $MYSQL_USER_PASSWORD/" $INSTALLER_TEMP_PATH/etc/proftpd/sql.conf
+
+# Replace original files
+rm -f /etc/proftpd/proftpd.conf
+mv $INSTALLER_TEMP_PATH/etc/proftpd/proftpd.conf /etc/proftpd/proftpd.conf
+rm -f /etc/proftpd/modules.conf
+mv $INSTALLER_TEMP_PATH/etc/proftpd/modules.conf /etc/proftpd/modules.conf
+rm -f /etc/proftpd/sql.conf
+mv $INSTALLER_TEMP_PATH/etc/proftpd/sql.conf /etc/proftpd/sql.conf
+
 
 # Restart ProFTPd
 service proftpd restart
