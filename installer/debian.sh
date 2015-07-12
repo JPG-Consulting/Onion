@@ -375,6 +375,8 @@ postconf -e "smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem"
 postconf -e "smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key"
 postconf -e "smtpd_use_tls=yes"
 postconf -e "smtpd_tls_auth_only = yes"
+postconf -# "smtpd_tls_session_cache_database"
+postconf -# "smtp_tls_session_cache_database"
 
 postconf -e "smtpd_sasl_type = dovecot"
 postconf -e "smtpd_sasl_path = private/auth"
