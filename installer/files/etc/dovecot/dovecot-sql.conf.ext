@@ -104,7 +104,7 @@ default_pass_scheme = CRYPT
 #password_query = \
 #  SELECT username, domain, password \
 #  FROM users WHERE username = '%n' AND domain = '%d'
-password_query = SELECT mail.mail_name AS username, domains.name AS domain, accounts.password AS password FROM mail INNER JOIN domains ON mail.domain_id = domains.id INNER JOIN accounts ON mail.account_id = accounts.id WHERE mail.mail_name = '%n' AND domains.name = '%d'
+password_query = SELECT mail.mail_name AS username, domains.name AS domain, mail.passwd AS password FROM mail INNER JOIN domains ON mail.domain_id = domains.id WHERE mail.mail_name = '%n' AND domains.name = '%d'
 
 # userdb query to retrieve the user information. It can return fields:
 #   uid - System UID (overrides mail_uid setting)
