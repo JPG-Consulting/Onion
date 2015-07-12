@@ -2,12 +2,12 @@
 <VirtualHost _default_:8443>
         ServerAdmin webmaster@localhost
 
-        DocumentRoot /var/www/vhosts/onion
+        DocumentRoot /var/www/vhosts/onion/public_html
         <Directory />
                 Options FollowSymLinks
                 AllowOverride None
         </Directory>
-        <Directory /var/www/vhosts/onion/>
+        <Directory /var/www/vhosts/onion/public_html>
                 Options Indexes FollowSymLinks MultiViews
                 AllowOverride None
                 Order allow,deny
