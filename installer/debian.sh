@@ -308,7 +308,7 @@ wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/file
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/dovecot/conf.d/10-ssl.conf -O $INSTALLER_TEMP_PATH/etc/dovecot/conf.d/10-ssl.conf
 
 # modify /etc/dovecot/dovecot-sql.conf.ext
-sed -i "s/#connect =/connect = host=127.0.0.1 dbname=$system_database user=$system_user password=$system_passwd/" $INSTALLER_TEMP_PATH/etc/dovecot/dovecot-sql.conf.ext
+sed -i "s/#connect =/connect = host=127.0.0.1 dbname=$MYSQL_DATABASE user=$MYSQL_USER password=$MYSQL_USER_PASSWORD/" $INSTALLER_TEMP_PATH/etc/dovecot/dovecot-sql.conf.ext
 
 # Replace the files
 rm -f /etc/dovecot/dovecot.conf
@@ -379,22 +379,22 @@ if [ ! -d /etc/postfix/mysql ]; then
     mkdir /etc/postfix/mysql
 fi
 
-echo "user = $system_user" > /etc/postfix/mysql/virtual-mailbox-domains.cf
-echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "user = $MYSQL_USER" > /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "password = $MYSQL_USER_PASSWORD" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
 echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
-echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
+echo "dbname = $MYSQL_DATABASE" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
 echo "query = SELECT 1 FROM domains WHERE name='%s' AND active=1" >> /etc/postfix/mysql/virtual-mailbox-domains.cf
 
-echo "user = $system_user" > /etc/postfix/mysql/virtual-mailbox-maps.cf
-echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "user = $MYSQL_USER" > /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "password = $MYSQL_USER_PASSWORD" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
 echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
-echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
+echo "dbname = $MYSQL_DATABASE" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
 echo "query = SELECT 1 FROM mail INNER JOIN domains ON mail.domain_id=domains.id WHERE mail.mail_name='%u' AND domains.name='%d'" >> /etc/postfix/mysql/virtual-mailbox-maps.cf
 
-echo "user = $system_user" > /etc/postfix/mysql/virtual-alias-maps.cf
-echo "password = $system_passwd" >> /etc/postfix/mysql/virtual-alias-maps.cf
+echo "user = $MYSQL_USER" > /etc/postfix/mysql/virtual-alias-maps.cf
+echo "password = $MYSQL_USER_PASSWORD" >> /etc/postfix/mysql/virtual-alias-maps.cf
 echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-alias-maps.cf
-echo "dbname = $system_database" >> /etc/postfix/mysql/virtual-alias-maps.cf
+echo "dbname = $MYSQL_DATABASE" >> /etc/postfix/mysql/virtual-alias-maps.cf
 echo "query = SELECT CONCAT(mail_aliases.alias, '@', domains.name) FROM mail_aliases INNER JOIN mail ON mail_aliases.mail_id = mail.id INNER JOIN domains ON mail.domain_id = domains.id WHERE mail_aliases.alias = '%u' AND domains.name = '%d'" >> /etc/postfix/mysql/virtual-alias-maps.cf
 
 # Restart postfix
