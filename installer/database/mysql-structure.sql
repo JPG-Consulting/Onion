@@ -51,8 +51,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
   `passwd` text CHARACTER SET ascii COLLATE ascii_bin,
   `domain_id` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `domain_id` (`domain_id`,`mail_name`),
-  KEY `account_id` (`account_id`)
+  UNIQUE KEY `domain_id` (`domain_id`,`mail_name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 -- --------------------------------------------------------
 --
