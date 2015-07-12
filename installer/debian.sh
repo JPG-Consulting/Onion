@@ -369,8 +369,9 @@ postconf -e "mydestination = localhost"
 postconf -e "virtual_transport = lmtp:unix:private/dovecot-lmtp"
 postconf -e "virtual_mailbox_domains = mysql:/etc/postfix/mysql/virtual-mailbox-domains.cf"
 postconf -e "virtual_mailbox_maps = mysql:/etc/postfix/mysql/virtual-mailbox-maps.cf"
-postconf -e "virtual_alias_maps = mysql:/etc/postfix/mysql/virtual-alias-maps.cf"
-
+#postconf -e "virtual_alias_maps = mysql:/etc/postfix/mysql/virtual-alias-maps.cf"
+postconf -e "virtual_alias_maps = proxy:mysql:/etc/postfix/mysql/virtual-alias-maps-redirect.cf, mysql:/etc/postfix/mysql/virtual-alias-maps.cf"
+ 
 postconf -e "smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem"
 postconf -e "smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key"
 postconf -e "smtpd_use_tls=yes"
@@ -405,6 +406,12 @@ echo "password = $MYSQL_USER_PASSWORD" >> /etc/postfix/mysql/virtual-alias-maps.
 echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-alias-maps.cf
 echo "dbname = $MYSQL_DATABASE" >> /etc/postfix/mysql/virtual-alias-maps.cf
 echo "query = SELECT CONCAT(mail_aliases.alias, '@', domains.name) FROM mail_aliases INNER JOIN mail ON mail_aliases.mail_id = mail.id INNER JOIN domains ON mail.domain_id = domains.id WHERE mail_aliases.alias = '%u' AND domains.name = '%d'" >> /etc/postfix/mysql/virtual-alias-maps.cf
+
+echo "user = $MYSQL_USER" > /etc/postfix/mysql/virtual-alias-maps-redirect.cf
+echo "password = $MYSQL_USER_PASSWORD" >> /etc/postfix/mysql/virtual-alias-maps-redirect.cf
+echo "hosts = 127.0.0.1" >> /etc/postfix/mysql/virtual-alias-maps-redirect.cf
+echo "dbname = $MYSQL_DATABASE" >> /etc/postfix/mysql/virtual-alias-maps-redirect.cf
+echo "query = SELECT mail_redirects.address FROM mail_redirects INNER JOIN mail ON mail_redirects.mail_id = mail.id INNER JOIN domains ON mail.domain_id = domains.id WHERE mail.mail_name = '%u' AND domains.name = '%d'" >> /etc/postfix/mysql/virtual-alias-maps-redirect.cf
 
 # Restart postfix
 service postfix restart
