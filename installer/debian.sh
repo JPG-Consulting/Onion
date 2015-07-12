@@ -422,9 +422,15 @@ if [ $(dpkg-query -W -f='${Status}' proftpd-mod-mysql | grep -c "install ok inst
 fi
 
 # Backup files
-cp /etc/proftpd/modules.conf /etc/proftpd/modules.conf.orig
-cp /etc/proftpd/proftpd.conf /etc/proftpd/proftpd.conf.orig
-cp /etc/proftpd/sql.conf /etc/proftpd/sql.conf.orig
+if [ ! -f /etc/proftpd/modules.conf.orig ]; then
+    cp /etc/proftpd/modules.conf /etc/proftpd/modules.conf.orig
+fi
+if [ ! -f /etc/proftpd/proftpd.conf.orig ]; then
+    cp /etc/proftpd/proftpd.conf /etc/proftpd/proftpd.conf.orig
+fi
+if [ ! -f /etc/proftpd/sql.conf.orig ]; then
+    cp /etc/proftpd/sql.conf /etc/proftpd/sql.conf.orig
+fi
 
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/proftpd/proftpd.conf -O $INSTALLER_TEMP_PATH/etc/proftpd/proftpd.conf
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/proftpd/modules.conf -O $INSTALLER_TEMP_PATH/etc/proftpd/modules.conf
