@@ -359,6 +359,7 @@ if [ ! -f /etc/postfix/main.cf.orig ]; then
 fi
 
 postconf -e "myhostname = $(hostname)"
+postconf -e "mydestination = localhost"
 postconf -e "virtual_transport = lmtp:unix:private/dovecot-lmtp"
 postconf -e "virtual_mailbox_domains = mysql:/etc/postfix/mysql/virtual-mailbox-domains.cf"
 postconf -e "virtual_mailbox_maps = mysql:/etc/postfix/mysql/virtual-mailbox-maps.cf"
