@@ -408,3 +408,30 @@ echo "query = SELECT CONCAT(mail_aliases.alias, '@', domains.name) FROM mail_ali
 
 # Restart postfix
 service postfix restart
+
+#----------------------------------------------------------#
+#                     ProFTPd Setup                        #
+#----------------------------------------------------------#
+if [ $(dpkg-query -W -f='${Status}' proftpd-basic | grep -c "install ok installed") -eq 0 ]; then
+    debconf-set-selections <<< "proftpd-basic   shared/proftpd/inetd_or_standalone      select  standalone"
+    apt-get --yes -qq install proftpd-basic
+fi
+
+if [ $(dpkg-query -W -f='${Status}' proftpd-mod-mysql | grep -c "install ok installed") -eq 0 ]; then
+    apt-get --yes -qq install proftpd-mod-mysql
+fi
+
+# Backup files
+cp /etc/proftpd/modules.conf /etc/proftpd/modules.conf.orig
+cp /etc/proftpd/proftpd.conf /etc/proftpd/proftpd.conf.orig
+cp /etc/proftpd/sql.conf /etc/proftpd/sql.conf.orig
+
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/proftpd/proftpd.conf -O $INSTALLER_TEMP_PATH/etc/proftpd/proftpd.conf
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/proftpd/modules.conf -O $INSTALLER_TEMP_PATH/etc/proftpd/modules.conf
+wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/proftpd/sql.conf -O $INSTALLER_TEMP_PATH/etc/proftpd/sql.conf
+
+# modify /etc/proftpd/sql.conf
+sed -i "s/#SQLConnectInfo proftpd@sql.example.com proftpd_user proftpd_password/SQLConnectInfo $MYSQL_DATABASE@localhost $MYSQL_USER $MYSQL_USER_PASSWORD/" $INSTALLER_TEMP_PATH/etc/proftpd/sql.conf
+
+# Restart ProFTPd
+service proftpd restart
