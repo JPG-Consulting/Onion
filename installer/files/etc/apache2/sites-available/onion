@@ -9,7 +9,7 @@
         </Directory>
         <Directory /var/www/vhosts/onion/public_html>
                 Options Indexes FollowSymLinks MultiViews
-                AllowOverride None
+                AllowOverride All
                 Order allow,deny
                 allow from all
         </Directory>
