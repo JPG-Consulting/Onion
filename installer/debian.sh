@@ -278,7 +278,29 @@ chmod 0644 /etc/apache2/ports.conf
 wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/files/etc/apache2/sites-available/onion -O /etc/apache2/sites-available/onion
 chmod 0777 /etc/apache2/sites-available/onion
 
+# Configure Zend Framework 2 Database
+echo "return array(" > /var/www/vhosts/onion/config/autoload/database.global.php
+echo "   'db' => array(" >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo "      'driver'         => 'Pdo'," >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo "      'dsn'            => 'mysql:dbname=$MYSQL_DATABASE;host=localhost'," >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo "   )," >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo "   'service_manager' => array(" >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo "      'factories' => array(" >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo "         'Zend\Db\Adapter\Adapter' => 'Zend\Db\Adapter\AdapterServiceFactory'," >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo "      )," >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo "   )," >> /var/www/vhosts/onion/config/autoload/database.global.php
+echo ");" >> /var/www/vhosts/onion/config/autoload/database.global.php
+
+echo "return array(" > /var/www/vhosts/onion/config/autoload/database.local.php
+echo "     'db' => array(" >> /var/www/vhosts/onion/config/autoload/database.local.php
+echo "         'username' => '$MYSQL_USER'," >> /var/www/vhosts/onion/config/autoload/database.local.php
+echo "         'password' => '$MYSQL_USER_PASSWORD'," >> /var/www/vhosts/onion/config/autoload/database.local.php
+echo "     )," >> /var/www/vhosts/onion/config/autoload/database.local.php
+echo " );" >> /var/www/vhosts/onion/config/autoload/database.local.php
+
+# Apache 2 enable site
 a2ensite onion
+a2enmod rewrite
 
 #----------------------------------------------
 # restart apache
