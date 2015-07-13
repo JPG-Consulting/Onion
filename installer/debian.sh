@@ -282,7 +282,8 @@ wget $GITHUB_RAW_URL/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY_BRANCH/installer/file
 chmod 0777 /etc/apache2/sites-available/onion
 
 # Configure Zend Framework 2 Database
-echo "return array(" > /var/www/vhosts/onion/config/autoload/database.global.php
+echo "<?php" > /var/www/vhosts/onion/config/autoload/database.global.php
+echo "return array(" >> /var/www/vhosts/onion/config/autoload/database.global.php
 echo "   'db' => array(" >> /var/www/vhosts/onion/config/autoload/database.global.php
 echo "      'driver'         => 'Pdo'," >> /var/www/vhosts/onion/config/autoload/database.global.php
 echo "      'dsn'            => 'mysql:dbname=$MYSQL_DATABASE;host=localhost'," >> /var/www/vhosts/onion/config/autoload/database.global.php
@@ -294,7 +295,8 @@ echo "      )," >> /var/www/vhosts/onion/config/autoload/database.global.php
 echo "   )," >> /var/www/vhosts/onion/config/autoload/database.global.php
 echo ");" >> /var/www/vhosts/onion/config/autoload/database.global.php
 
-echo "return array(" > /var/www/vhosts/onion/config/autoload/database.local.php
+echo "<?php" > /var/www/vhosts/onion/config/autoload/database.local.php
+echo "return array(" >> /var/www/vhosts/onion/config/autoload/database.local.php
 echo "     'db' => array(" >> /var/www/vhosts/onion/config/autoload/database.local.php
 echo "         'username' => '$MYSQL_USER'," >> /var/www/vhosts/onion/config/autoload/database.local.php
 echo "         'password' => '$MYSQL_USER_PASSWORD'," >> /var/www/vhosts/onion/config/autoload/database.local.php
