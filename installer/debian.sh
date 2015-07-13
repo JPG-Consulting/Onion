@@ -4,6 +4,9 @@ GITHUB_RAW_URL="https://raw.githubusercontent.com/JPG-Consulting"
 GITHUB_REPOSITORY="Onion"
 GITHUB_REPOSITORY_BRANCH="test"
 
+PROFTPD_VIRTUAL_UID="2001"
+PROFTPD_VIRTUAL_GID="2001"
+
 INSTALLER_TEMP_PATH='/tmp/onion-installer'
 
 #----------------------------------------------------------#
@@ -297,6 +300,9 @@ echo "         'username' => '$MYSQL_USER'," >> /var/www/vhosts/onion/config/aut
 echo "         'password' => '$MYSQL_USER_PASSWORD'," >> /var/www/vhosts/onion/config/autoload/database.local.php
 echo "     )," >> /var/www/vhosts/onion/config/autoload/database.local.php
 echo " );" >> /var/www/vhosts/onion/config/autoload/database.local.php
+
+chown $PROFTPD_VIRTUAL_UID:PROFTPD_VIRTUAL_GID /var/www/vhosts/onion/config/autoload/database.global.php
+chown $PROFTPD_VIRTUAL_UID:PROFTPD_VIRTUAL_GID /var/www/vhosts/onion/config/autoload/database.local.php
 
 # Apache 2 enable site
 a2ensite onion
