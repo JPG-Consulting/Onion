@@ -214,19 +214,19 @@ a2enmod ssl
 echo "Setting PHP5..."
 
 # PHP 5.6
-grep_output="$(grep 'deb http://packages.dotdeb.org wheezy-php56 all' /etc/apt/sources.list)"
-if [ -z "$grep_output" ]; then
-    if [ ! -f /etc/apt/sources.list.d/dotdeb.list ]; then
-        touch /etc/apt/sources.list.d/dotdeb.list
-    fi
-    
-    echo "deb http://packages.dotdeb.org wheezy-php56 all" >> /etc/apt/sources.list.d/dotdeb.list
-    echo "deb-src http://packages.dotdeb.org wheezy-php56 all" >> /etc/apt/sources.list.d/dotdeb.list
-    
-    wget http://www.dotdeb.org/dotdeb.gpg -O- |apt-key add –
-    
-    apt-get -y -qq update
-fi
+#grep_output="$(grep 'deb http://packages.dotdeb.org wheezy-php56 all' /etc/apt/sources.list)"
+#if [ -z "$grep_output" ]; then
+#    if [ ! -f /etc/apt/sources.list.d/dotdeb.list ]; then
+#        touch /etc/apt/sources.list.d/dotdeb.list
+#    fi
+#    
+#    echo "deb http://packages.dotdeb.org wheezy-php56 all" >> /etc/apt/sources.list.d/dotdeb.list
+#    echo "deb-src http://packages.dotdeb.org wheezy-php56 all" >> /etc/apt/sources.list.d/dotdeb.list
+#    
+#    wget http://www.dotdeb.org/dotdeb.gpg -O- |apt-key add –
+#    
+#    apt-get -y -qq update
+#fi
 
 install_required_packages php5 libapache2-mod-php5 php5-cli php5-common php5-cgi php5-mysql php5-curl php5-gd php5-mcrypt php5-memcache php5-memcached php5-intl
 
